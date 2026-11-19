@@ -192,6 +192,63 @@
       </p>
     </div>
 
+    <!-- ================= 步驟 1：填寫挑戰者姓名 (介面最上方) ================= -->
+    <div id="stepNameSection" class="w-full max-w-4xl mb-8 bg-gradient-to-r from-slate-900/90 via-sky-950/70 to-slate-900/90 border-2 border-sky-500/50 hover:border-sky-400 rounded-3xl p-5 sm:p-6 backdrop-blur-md shadow-2xl relative overflow-hidden transition-all duration-300">
+      
+      <!-- 背景光暈裝飾 -->
+      <div class="absolute -top-12 -right-12 w-36 h-36 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        
+        <!-- 左側步驟說明 -->
+        <div class="space-y-1.5">
+          <div class="inline-flex items-center space-x-2 text-xs font-bold text-amber-300 tracking-wider">
+            <span class="px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 font-mono">步驟 1</span>
+            <span>登錄挑戰者身分</span>
+          </div>
+          <h2 class="text-lg sm:text-2xl font-black text-white flex items-center space-x-2">
+            <span>填寫你的名字</span>
+            <span id="nameBadgeIndicator" class="text-xs font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">尚未登錄</span>
+          </h2>
+          <p class="text-xs text-slate-300">
+            解鎖的所有超能力卡片與能量小人將綁定於此名字，隨時可直接在下方更改。
+          </p>
+        </div>
+
+        <!-- 右側輸入區域 -->
+        <div class="flex-shrink-0 w-full md:w-auto flex flex-col sm:flex-row items-stretch gap-2.5">
+          <div class="relative min-w-[240px] sm:min-w-[280px]">
+            <input 
+              id="heroPlayerNameInput" 
+              type="text" 
+              placeholder="請輸入你的名字 (例：北風阿柏)" 
+              class="w-full bg-slate-950 border-2 border-slate-700 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/30 rounded-2xl px-4 py-3.5 text-white text-base font-bold outline-none transition placeholder:text-slate-600 placeholder:font-normal"
+              onkeydown="if(event.key === 'Enter') confirmPlayerName();"
+            />
+          </div>
+          <button 
+            id="confirmNameBtn"
+            onclick="confirmPlayerName()" 
+            class="py-3.5 px-6 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-black text-sm shadow-lg shadow-sky-600/30 flex items-center justify-center space-x-1.5 transition transform active:scale-95 whitespace-nowrap"
+          >
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+            <span id="confirmNameBtnText">確認登記</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 即時已登錄狀態通知條 -->
+      <div id="nameSuccessBanner" class="hidden mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+        <span class="text-emerald-400 flex items-center space-x-1.5 font-medium">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>當前挑戰者：<strong id="activePlayerNameDisplay" class="text-white font-bold underline"></strong></span>
+        </span>
+        <span class="text-slate-400 text-[11px]">隨時可修改文字並點擊確認更名</span>
+      </div>
+
+    </div>
+
     <!-- 核心互動網格：左側小人進度條，右側兩大功能區塊 -->
     <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       
@@ -347,7 +404,7 @@
             <div class="space-y-2">
               <div class="inline-flex items-center space-x-2 text-xs font-bold text-sky-400 tracking-wider">
                 <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
-                <span>STEP 01・解鎖神諭</span>
+                <span>步驟 2・解鎖神諭</span>
               </div>
               <h2 class="text-xl md:text-2xl font-black text-white group-hover:text-sky-200 transition">
                 收集技能
@@ -375,7 +432,7 @@
             <div class="space-y-2">
               <div class="inline-flex items-center space-x-2 text-xs font-bold text-blue-400 tracking-wider">
                 <i data-lucide="grid" class="w-3.5 h-3.5"></i>
-                <span>STEP 02・能力寶庫</span>
+                <span>步驟 3・能力寶庫</span>
               </div>
               <h2 class="text-xl md:text-2xl font-black text-white group-hover:text-blue-200 transition">
                 技能庫
@@ -1164,7 +1221,7 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
     const STORAGE_KEY_VAULT = 'BOREAS_PLAYER_VAULT_V1';
 
     let cardDatabase = [];
-    let currentPlayerName = "北風阿柏";
+    let currentPlayerName = "";
     let playerVault = []; // 玩家收集的卡片清單: [{ code, skillName, series, studentName, savedSeries, unlockedAt }]
     let tempRevealedCard = null;
     let currentSelectedTargetSeries = '破風應變系';
@@ -1230,34 +1287,107 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
       lucide.createIcons();
 
       // 3. 一進來先跳出打名字的框框
-      openNameModal();
+      // 已改由頂部實體輸入框主導
+      initHeroNameInput();
     }
 
     /* ============================================================
-       挑戰者姓名邏輯
+       挑戰者姓名邏輯 (介面最上方步驟一)
        ============================================================ */
-    function openNameModal() {
-      document.getElementById('playerNameInput').value = currentPlayerName;
-      document.getElementById('nameModal').classList.remove('hidden');
+    function initHeroNameInput() {
+      const saved = localStorage.getItem(STORAGE_KEY_PLAYER);
+      const input = document.getElementById('heroPlayerNameInput');
+      
+      // 若已有存檔 (且不是卡住的預設提示)，則載入
+      if (saved && saved.trim() !== "") {
+        currentPlayerName = saved.trim();
+        if (input) input.value = currentPlayerName;
+        showNameConfirmedState(true);
+      } else {
+        currentPlayerName = "";
+        if (input) {
+          input.value = "";
+          input.focus();
+        }
+        showNameConfirmedState(false);
+      }
+      updatePlayerNameUI();
     }
 
-    function savePlayerName() {
-      const input = document.getElementById('playerNameInput').value.trim();
-      if (!input) {
-        alert("請輸入挑戰者姓名！");
+    function confirmPlayerName() {
+      const input = document.getElementById('heroPlayerNameInput');
+      const val = input.value.trim();
+      if (!val) {
+        alert("請先填寫你的名字！");
+        input.focus();
         return;
       }
-      currentPlayerName = input;
+      currentPlayerName = val;
       localStorage.setItem(STORAGE_KEY_PLAYER, currentPlayerName);
       updatePlayerNameUI();
-      document.getElementById('nameModal').classList.remove('hidden');
-      document.getElementById('nameModal').classList.add('hidden');
+      showNameConfirmedState(true);
+
+      // 觸發確認成功微特效
+      confetti({
+        particleCount: 25,
+        spread: 40,
+        origin: { y: 0.3 },
+        colors: ['#38bdf8', '#fbbf24', '#ffffff']
+      });
+    }
+
+    function showNameConfirmedState(isConfirmed) {
+      const badge = document.getElementById('nameBadgeIndicator');
+      const banner = document.getElementById('nameSuccessBanner');
+      const display = document.getElementById('activePlayerNameDisplay');
+      const btnText = document.getElementById('confirmNameBtnText');
+      const input = document.getElementById('heroPlayerNameInput');
+
+      if (isConfirmed && currentPlayerName) {
+        if (badge) {
+          badge.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-600 flex items-center space-x-1";
+          badge.innerHTML = "<span>✓ 已登錄</span>";
+        }
+        if (banner) banner.classList.remove('hidden');
+        if (display) display.textContent = currentPlayerName;
+        if (btnText) btnText.textContent = "更新姓名";
+        if (input) {
+          input.classList.remove('border-slate-700');
+          input.classList.add('border-emerald-500/80');
+        }
+      } else {
+        if (badge) {
+          badge.className = "text-xs font-normal px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-700";
+          badge.textContent = "請先填寫名字";
+        }
+        if (banner) banner.classList.add('hidden');
+        if (btnText) btnText.textContent = "確認登記";
+        if (input) {
+          input.classList.remove('border-emerald-500/80');
+          input.classList.add('border-slate-700');
+        }
+      }
+    }
+
+    function openNameModal() {
+      // 點擊頂部挑戰者標籤時，直接平滑滾動並聚焦到最上方的步驟一輸入框
+      const input = document.getElementById('heroPlayerNameInput');
+      if (input) {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        input.focus();
+        input.select();
+      }
     }
 
     function updatePlayerNameUI() {
-      document.getElementById('headerPlayerName').textContent = currentPlayerName;
-      document.getElementById('vaultPlayerName').textContent = currentPlayerName;
-      document.getElementById('rewardPlayerName').textContent = currentPlayerName;
+      const nameToShow = currentPlayerName || "尚未登記";
+      const headerEl = document.getElementById('headerPlayerName');
+      const vaultEl = document.getElementById('vaultPlayerName');
+      const rewardEl = document.getElementById('rewardPlayerName');
+      
+      if (headerEl) headerEl.textContent = nameToShow;
+      if (vaultEl) vaultEl.textContent = nameToShow;
+      if (rewardEl) rewardEl.textContent = nameToShow;
     }
 
     /* ============================================================
@@ -1334,6 +1464,11 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
        區塊 3：收集技能（輸入解鎖碼）
        ============================================================ */
     function openUnlockModal() {
+      if (!currentPlayerName || currentPlayerName.trim() === "") {
+        alert("請先在頁面最上方「步驟 1」填寫你的挑戰者姓名喔！");
+        openNameModal();
+        return;
+      }
       document.getElementById('unlockCodeInput').value = '';
       document.getElementById('unlockErrorMsg').classList.add('hidden');
       document.getElementById('unlockModal').classList.remove('hidden');
