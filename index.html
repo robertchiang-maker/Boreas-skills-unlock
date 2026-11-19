@@ -471,6 +471,32 @@
 
       </div>
     </div>
+
+    <!-- ================= 頁面最下方：重新收集按鍵 ================= -->
+    <div class="w-full max-w-4xl mt-12 mb-6 flex flex-col items-center">
+      <div class="w-full bg-slate-900/70 border border-slate-800 hover:border-slate-700 rounded-3xl p-6 backdrop-blur-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left transition shadow-xl">
+        <div class="space-y-1">
+          <div class="flex items-center justify-center sm:justify-start space-x-2 text-xs font-bold text-slate-400">
+            <i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-400"></i>
+            <span>重置冒險進度</span>
+          </div>
+          <h3 class="text-base sm:text-lg font-black text-slate-100">
+            想重新體驗一次解鎖超能力？
+          </h3>
+          <p class="text-xs text-slate-400 max-w-lg">
+            點擊「重新收集」將會清空目前收集的所有技能卡與小人能量，讓你可以重新玩一次。
+          </p>
+        </div>
+
+        <button 
+          onclick="handleRestartGame()" 
+          class="flex-shrink-0 py-3.5 px-7 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-700 hover:from-rose-900 hover:to-rose-800 border border-slate-600 hover:border-rose-500 text-slate-200 hover:text-white font-black text-sm shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 group"
+        >
+          <i data-lucide="refresh-cw" class="w-4 h-4 text-amber-400 group-hover:rotate-180 transition duration-500"></i>
+          <span>重新收集</span>
+        </button>
+      </div>
+    </div>
   </main>
 
   <!-- ================= 彈窗 1：設定挑戰者姓名 ================= -->
@@ -775,11 +801,15 @@
         </div>
       </div>
 
-      <div class="flex gap-3">
+      <div class="flex flex-col sm:flex-row gap-2.5">
         <button onclick="triggerConfetti()" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-sm shadow-lg shadow-amber-500/30 transition">
           再次慶祝 🎉
         </button>
-        <button onclick="closeRewardModal()" class="py-3 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
+        <button onclick="closeRewardModal(); handleRestartGame();" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-rose-900 border border-slate-700 hover:border-rose-500 text-slate-200 hover:text-white font-bold text-xs transition flex items-center justify-center space-x-1">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>重新收集</span>
+        </button>
+        <button onclick="closeRewardModal()" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
           關閉
         </button>
       </div>
@@ -1917,6 +1947,38 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
     /* ============================================================
        清空重設進度
        ============================================================ */
+        /* ============================================================
+       重新收集 (讓遊戲可以重新玩一次)
+       ============================================================ */
+    function handleRestartGame() {
+      const currentCount = playerVault.length;
+      const msg = currentCount > 0 
+        ? "確定要「重新收集」嗎？\n\n目前已收集 " + currentCount + " 張技能卡，重新收集將會清空所有卡片與小人能量，讓你重新體驗遊戲！（挑戰者姓名將會保留）"
+        : "確定要重新開始遊戲嗎？";
+
+      if (confirm(msg)) {
+        // 1. 清空技能庫
+        playerVault = [];
+        localStorage.removeItem(STORAGE_KEY_VAULT);
+
+        // 2. 更新進度與UI
+        renderProgressUI();
+        renderQuickSeriesStats();
+
+        // 3. 若技能庫開啟中，同步更新
+        if (!document.getElementById('skillVaultModal').classList.contains('hidden')) {
+          switchVaultTab(currentVaultTab);
+        }
+
+        // 4. 若獎勵彈窗開啟中，關閉
+        document.getElementById('rewardModal').classList.add('hidden');
+
+        // 5. 提示並平滑滾動回頂端
+        alert("✨ 能量與技能庫已清空，遊戲重新開始！祝你探索順利！");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
     function resetPlayerProgress() {
       if (confirm("確定要重設當前挑戰者的收集進度嗎？（卡片資料庫不會被刪除）")) {
         playerVault = [];
