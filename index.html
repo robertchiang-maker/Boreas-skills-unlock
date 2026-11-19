@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>北風學院｜在校園生活的日常裡，解鎖隱藏版超能力</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@600;800&display=swap');
+
+    :root {
+      --bg-dark-navy: #0e1e2d;
+      --card-navy-base: #244258;
+      --card-navy-dark: #193244;
+      --border-cyan: #38bdf8;
+      --gold-accent: #f59e0b;
+      --parchment-white: #eef5f9;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      background-color: #0b1520;
+      background-image: 
+        radial-gradient(circle at 50% 0%, #1a3854 0%, transparent 60%),
+        radial-gradient(circle at 10% 90%, #12283d 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, #152f47 0%, transparent 50%),
+        linear-gradient(to bottom, #09131d, #0b1724);
+      background-attachment: fixed;
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .font-cinzel {
+      font-family: 'Cinzel', serif;
+    }
+
+    /* 參考附圖的卡片材質紋理效果 */
+    .card-texture-bg {
+      background-color: #27475d;
+      background-image: 
+        radial-gradient(circle at 50% 30%, rgba(55, 99, 128, 0.4) 0%, rgba(25, 48, 66, 0.95) 100%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 4px);
+      box-shadow: 
+        0 20px 40px -10px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(147, 197, 253, 0.25) inset;
+    }
+
+    /* 參考附圖頂部的復古白底邊框條 */
+    .card-top-bar {
+      background: #edf5f9;
+      border: 3.5px solid #20415a;
+      box-shadow: 
+        0 2px 6px rgba(0,0,0,0.3),
+        inset 0 0 0 1.5px rgba(255,255,255,0.8);
+      position: relative;
+    }
+
+    /* 拐角裝飾小圓凸點（精確模擬附圖邊框的四角圓形飾點） */
+    .corner-pin {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 3px solid #20415a;
+      background: #edf5f9;
+      z-index: 10;
+    }
+    .corner-pin-tl { top: -7px; left: -7px; }
+    .corner-pin-tr { top: -7px; right: -7px; }
+    .corner-pin-bl { bottom: -7px; left: -7px; }
+    .corner-pin-br { bottom: -7px; right: -7px; }
+
+    /* 頂部三格的垂直分隔線 */
+    .top-bar-divider {
+      position: relative;
+    }
+    .top-bar-divider::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 3.5px;
+      background: #20415a;
+    }
+
+    /* 卡片下方的展示視窗矩形（對應附圖中的淺灰/青灰矩形框） */
+    .card-illustration-frame {
+      background: linear-gradient(135deg, #a4b8c6 0%, #879dae 100%);
+      box-shadow: 
+        inset 0 4px 12px rgba(0,0,0,0.25),
+        0 2px 6px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    /* 浮空特效 */
+    @keyframes subtleFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    .hover-float {
+      animation: subtleFloat 4s ease-in-out infinite;
+    }
+
+    /* 能量小人蓄力光效 */
+    @keyframes energyPulse {
+      0%, 100% { filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.5)); }
+      50% { filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.9)) drop-shadow(0 0 30px rgba(125, 211, 252, 0.6)); }
+    }
+    .energy-glow {
+      animation: energyPulse 3s ease-in-out infinite;
+    }
+
+    /* 滿額全場爆發動畫 */
+    @keyframes goldenGlow {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 25px rgba(251, 191, 36, 0.6)); }
+      50% { filter: drop-shadow(0 0 22px rgba(245, 158, 11, 1)) drop-shadow(0 0 45px rgba(251, 191, 36, 0.9)); }
+    }
+    .super-energy-glow {
+      animation: goldenGlow 1.5s ease-in-out infinite;
+    }
+
+    /* 自定義捲軸 */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-100">
+
+  <!-- ================= 頂部導航欄 ================= -->
+  <header class="border-b border-sky-900/50 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-700 flex items-center justify-center shadow-lg shadow-sky-500/20 text-white font-black text-xl font-cinzel">
+          ❄️
+        </div>
+        <div>
+          <div class="text-xs tracking-widest text-sky-400 font-semibold font-cinzel">BOREAS ACADEMY</div>
+          <div class="text-sm md:text-base font-black tracking-wide text-slate-100">北風學院｜技能解鎖庫</div>
+        </div>
+      </div>
+
+      <!-- 右側挑戰者身分與後台開關 -->
+      <div class="flex items-center space-x-3 text-xs md:text-sm">
+        <div class="bg-sky-950/80 border border-sky-700/60 rounded-full px-3 py-1.5 flex items-center space-x-2">
+          <span class="text-sky-300">挑戰者：</span>
+          <span id="headerPlayerName" class="font-bold text-amber-300">北風阿柏</span>
+          <button onclick="openNameModal()" title="修改挑戰者姓名" class="text-slate-400 hover:text-white transition">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 主要內容區 ================= -->
+  <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-6 md:py-10 flex flex-col items-center">
+    
+    <!-- 1. 封面標題 (深藍學院風) -->
+    <div class="text-center max-w-3xl mb-8 space-y-2">
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-sky-900/40 border border-sky-500/30 text-sky-300 text-xs font-medium mb-1">
+        <span class="animate-pulse">✨</span>
+        <span>北風超能力探索計畫</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white drop-shadow-md">
+        在校園生活的日常裡，<br class="sm:hidden" /><span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-blue-200 to-amber-300">解鎖隱藏版超能力</span>
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto">
+        在北風學院的校園中，每一次應變、共鳴與觀察都是一門強大魔法。收集12張技能卡，喚醒你的完整能量！
+      </p>
+    </div>
+
+    <!-- 核心互動網格：左側小人進度條，右側兩大功能區塊 -->
+    <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- ================= 區塊 6：進度條（人型能量體，直接展示在主頁） ================= -->
+      <div class="lg:col-span-5 w-full bg-slate-900/60 border border-sky-900/40 rounded-3xl p-6 backdrop-blur-sm relative overflow-hidden shadow-2xl flex flex-col items-center text-center">
+        <!-- 裝飾背景光環 -->
+        <div class="absolute -top-24 -left-24 w-56 h-56 bg-sky-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-56 h-56 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="w-full flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i>
+            <h3 class="font-bold text-slate-200 text-base">超能力能量蓄積</h3>
+          </div>
+          <span id="progressBadge" class="text-xs px-2.5 py-1 rounded-full bg-sky-950 text-sky-300 border border-sky-800 font-semibold font-mono">
+            0 / 12
+          </span>
+        </div>
+
+        <!-- 小人人體形狀能量容器 -->
+        <div class="relative w-full max-w-[240px] h-[340px] my-2 flex items-center justify-center">
+          
+          <!-- 小人 SVG 容器 -->
+          <svg id="humanoidSvg" viewBox="0 0 200 320" class="w-full h-full drop-shadow-xl transition-all duration-700" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- 能量漸層 -->
+              <linearGradient id="energyFillGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#0284c7" />
+                <stop offset="50%" stop-color="#38bdf8" />
+                <stop offset="90%" stop-color="#7dd3fc" />
+                <stop offset="100%" stop-color="#fef08a" />
+              </linearGradient>
+
+              <!-- 小人人體剪影路徑 (Head, Torso, Arms, Legs) -->
+              <clipPath id="humanSilhouetteClip">
+                <!-- 頭部 -->
+                <circle cx="100" cy="40" r="24" />
+                <!-- 脖子 -->
+                <rect x="94" y="62" width="12" height="10" rx="3" />
+                <!-- 軀幹與雙肩胸腹 (柔和幾何) -->
+                <path d="M 62,80 C 72,72 128,72 138,80 C 145,95 140,165 130,175 C 120,185 80,185 70,175 C 60,165 55,95 62,80 Z" />
+                <!-- 左手臂 -->
+                <path d="M 60,82 C 45,95 32,130 30,160 C 28,172 38,175 42,165 C 46,140 56,110 68,96 Z" />
+                <!-- 右手臂 -->
+                <path d="M 140,82 C 155,95 168,130 170,160 C 172,172 162,175 158,165 C 154,140 144,110 132,96 Z" />
+                <!-- 雙腿下肢 -->
+                <path d="M 74,178 C 76,210 74,260 70,305 C 68,314 84,316 88,308 C 94,270 96,225 97,185 L 103,185 C 104,225 106,270 112,308 C 116,316 132,314 130,305 C 126,260 124,210 126,178 Z" />
+              </clipPath>
+
+              <!-- 滿額金色爆發漸層 -->
+              <linearGradient id="fullPowerGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#b45309" />
+                <stop offset="40%" stop-color="#f59e0b" />
+                <stop offset="80%" stop-color="#fbbf24" />
+                <stop offset="100%" stop-color="#ffffff" />
+              </linearGradient>
+            </defs>
+
+            <!-- 1. 背景底模 (暗灰藍空心剪影) -->
+            <g clip-path="url(#humanSilhouetteClip)">
+              <!-- 底座暗色輪廓 -->
+              <rect x="0" y="0" width="200" height="320" fill="#132332" />
+              <!-- 內部微弱骨骼脈絡裝飾線條 -->
+              <line x1="100" y1="40" x2="100" y2="185" stroke="#1e3a53" stroke-width="2" stroke-dasharray="3 3" />
+              <line x1="50" y1="120" x2="150" y2="120" stroke="#1e3a53" stroke-width="1.5" />
+              <line x1="70" y1="180" x2="130" y2="180" stroke="#1e3a53" stroke-width="1.5" />
+            </g>
+
+            <!-- 2. 動態能量充能高度 (依據進度比例 0~12) -->
+            <g clip-path="url(#humanSilhouetteClip)">
+              <!-- 能量矩形 (由下往上升) -->
+              <rect id="energyLevelRect" x="0" y="320" width="200" height="320" fill="url(#energyFillGrad)" class="transition-all duration-700 ease-out opacity-90" />
+              
+              <!-- 能量液體頂部波浪波紋 -->
+              <line id="energyWaveLine" x1="0" y1="320" x2="200" y2="320" stroke="#ffffff" stroke-width="3" opacity="0.7" class="transition-all duration-700" />
+            </g>
+
+            <!-- 3. 外邊框高光勾勒 (精緻科技魔法外框) -->
+            <g fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.65">
+              <circle cx="100" cy="40" r="24" />
+              <path d="M 62,80 C 72,72 128,72 138,80 C 145,95 140,165 130,175 C 120,185 80,185 70,175 C 60,165 55,95 62,80 Z" />
+              <path d="M 60,82 C 45,95 32,130 30,160 C 28,172 38,175 42,165 C 46,140 56,110 68,96 Z" />
+              <path d="M 140,82 C 155,95 168,130 170,160 C 172,172 162,175 158,165 C 154,140 144,110 132,96 Z" />
+              <path d="M 74,178 C 76,210 74,260 70,305 C 68,314 84,316 88,308 C 94,270 96,225 97,185 L 103,185 C 104,225 106,270 112,308 C 116,316 132,314 130,305 C 126,260 124,210 126,178 Z" />
+            </g>
+
+            <!-- 4. 12個星芒能量節點 (當收集對應張數時逐一點亮) -->
+            <g id="energyNodesGroup">
+              <!-- 節點 1: 右足底 (x:120, y:295) -->
+              <circle id="node-1" cx="120" cy="295" r="4" fill="#334155" />
+              <!-- 節點 2: 左足底 (x:80, y:295) -->
+              <circle id="node-2" cx="80" cy="295" r="4" fill="#334155" />
+              <!-- 節點 3: 右膝 (x:118, y:245) -->
+              <circle id="node-3" cx="118" cy="245" r="4" fill="#334155" />
+              <!-- 節點 4: 左膝 (x:82, y:245) -->
+              <circle id="node-4" cx="82" cy="245" r="4" fill="#334155" />
+              <!-- 節點 5: 右手掌 (x:162, y:165) -->
+              <circle id="node-5" cx="162" cy="165" r="4" fill="#334155" />
+              <!-- 節點 6: 左手掌 (x:38, y:165) -->
+              <circle id="node-6" cx="38" cy="165" r="4" fill="#334155" />
+              <!-- 節點 7: 丹田核心 (x:100, y:170) -->
+              <circle id="node-7" cx="100" cy="170" r="5" fill="#334155" />
+              <!-- 節點 8: 心輪共鳴 (x:100, y:125) -->
+              <circle id="node-8" cx="100" cy="125" r="5" fill="#334155" />
+              <!-- 節點 9: 右肩 (x:132, y:86) -->
+              <circle id="node-9" cx="132" cy="86" r="4" fill="#334155" />
+              <!-- 節點 10: 左肩 (x:68, y:86) -->
+              <circle id="node-10" cx="68" cy="86" r="4" fill="#334155" />
+              <!-- 節點 11: 眉心智慧之眼 (x:100, y:45) -->
+              <circle id="node-11" cx="100" cy="45" r="5" fill="#334155" />
+              <!-- 節點 12: 頂輪北極星冠 (x:100, y:24) -->
+              <circle id="node-12" cx="100" cy="24" r="6" fill="#334155" />
+            </g>
+          </svg>
+
+          <!-- 滿額發光特效標章 -->
+          <div id="fullPowerBadge" class="hidden absolute top-2 right-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-xs px-2.5 py-1 rounded-full shadow-lg animate-bounce flex items-center space-x-1">
+            <span>🏆</span>
+            <span>已滿充能！</span>
+          </div>
+        </div>
+
+        <!-- 進度文字說明 -->
+        <div class="w-full mt-2 space-y-2">
+          <div class="flex justify-between text-xs text-slate-400 px-2 font-mono">
+            <span>當前能量：<strong id="progressPercent" class="text-sky-300">0%</strong></span>
+            <span>目標：12 張技能卡</span>
+          </div>
+          <!-- 線性進度條輔助 -->
+          <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700/80">
+            <div id="progressBarFill" class="bg-gradient-to-r from-sky-500 to-amber-400 h-2.5 rounded-full transition-all duration-700" style="width: 0%"></div>
+          </div>
+          <p id="progressStatusText" class="text-xs text-slate-400 italic pt-1">
+            小人身體尚在沉睡，請輸入解鎖碼注入技能能量...
+          </p>
+        </div>
+
+        <!-- 若滿12張時顯示的立即兌換按鈕 -->
+        <div id="redeemQuickBtnContainer" class="w-full mt-4 hidden">
+          <button onclick="showRewardModal()" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-sm shadow-lg shadow-amber-500/30 flex items-center justify-center space-x-2 transition transform hover:scale-[1.02]">
+            <span>🎁</span>
+            <span>任務完成！點此兌換獎品</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= 區塊 3 & 5：兩大操作入口（收集技能 & 技能庫） ================= -->
+      <div class="lg:col-span-7 w-full flex flex-col space-y-6">
+        
+        <!-- 功能 1：【收集技能】按鈕卡片 -->
+        <div class="bg-gradient-to-br from-slate-900/90 via-sky-950/40 to-slate-900/90 border border-sky-600/40 hover:border-sky-400/80 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl transition-all duration-300 group hover:shadow-sky-500/10">
+          <div class="flex items-start justify-between">
+            <div class="space-y-2">
+              <div class="inline-flex items-center space-x-2 text-xs font-bold text-sky-400 tracking-wider">
+                <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+                <span>STEP 01・解鎖神諭</span>
+              </div>
+              <h2 class="text-xl md:text-2xl font-black text-white group-hover:text-sky-200 transition">
+                收集技能
+              </h2>
+              <p class="text-slate-400 text-xs md:text-sm max-w-md">
+                聽完故事請在此輸入解鎖碼（卡片編號），喚醒深藏在校園中的風之超能力。
+              </p>
+            </div>
+            <div class="w-14 h-14 rounded-2xl bg-sky-900/60 border border-sky-500/30 flex items-center justify-center text-sky-300 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-slate-950 transition duration-300 shadow-lg">
+              <i data-lucide="key-round" class="w-7 h-7"></i>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <button onclick="openUnlockModal()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-base shadow-lg shadow-sky-600/30 flex items-center justify-center space-x-2 transition transform active:scale-95">
+              <i data-lucide="sparkles" class="w-5 h-5 text-amber-200"></i>
+              <span>輸入解鎖碼</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 功能 2：【技能庫】按鈕卡片 -->
+        <div class="bg-gradient-to-br from-slate-900/90 via-slate-900/40 to-slate-900/90 border border-slate-700/60 hover:border-blue-500/60 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-xl transition-all duration-300 group hover:shadow-blue-500/10">
+          <div class="flex items-start justify-between">
+            <div class="space-y-2">
+              <div class="inline-flex items-center space-x-2 text-xs font-bold text-blue-400 tracking-wider">
+                <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+                <span>STEP 02・能力寶庫</span>
+              </div>
+              <h2 class="text-xl md:text-2xl font-black text-white group-hover:text-blue-200 transition">
+                技能庫
+              </h2>
+              <p class="text-slate-400 text-xs md:text-sm max-w-md">
+                檢視你已蒐集並歸類的技能卡。包含破風、逆風、聚風、御風、疾風與北風異能六大系列。
+              </p>
+            </div>
+            <div class="w-14 h-14 rounded-2xl bg-blue-950/60 border border-blue-500/30 flex items-center justify-center text-blue-300 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-slate-950 transition duration-300 shadow-lg">
+              <i data-lucide="layers" class="w-7 h-7"></i>
+            </div>
+          </div>
+
+          <!-- 六大系列即時微型統計標籤 -->
+          <div id="quickSeriesBadges" class="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+            <!-- 動態插入六大系列各收集幾張 -->
+          </div>
+
+          <div class="mt-6">
+            <button onclick="openSkillVaultModal()" class="w-full py-3.5 px-6 rounded-2xl bg-slate-800 hover:bg-slate-700/90 border border-slate-600/60 hover:border-sky-400 text-white font-bold text-sm md:text-base flex items-center justify-center space-x-2 transition shadow-md">
+              <i data-lucide="book-open" class="w-5 h-5 text-sky-400"></i>
+              <span>開啟技能庫總覽</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 溫馨提示卡片 -->
+        <div class="rounded-2xl border border-sky-900/30 bg-sky-950/20 p-4 text-xs text-slate-400 flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-sky-900/40 flex items-center justify-center text-sky-300 flex-shrink-0">
+            <i data-lucide="info" class="w-4 h-4"></i>
+          </div>
+          <div>
+            每張卡片皆可在解鎖時自訂存放系列。累積達成 12 張後將自動觸發專屬兌換獎勵！
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= 彈窗 1：設定挑戰者姓名 ================= -->
+  <div id="nameModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-sky-800/80 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative text-center space-y-5">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/20">
+        <i data-lucide="user-check" class="w-8 h-8"></i>
+      </div>
+      <div>
+        <h3 class="text-xl font-black text-white">登錄北風學院挑戰者</h3>
+        <p class="text-xs text-slate-400 mt-1">請填寫你的學院稱號或姓名，以建立專屬技能紀錄。</p>
+      </div>
+
+      <div class="text-left space-y-1.5">
+        <label class="text-xs font-semibold text-slate-300">挑戰者姓名</label>
+        <input id="playerNameInput" type="text" placeholder="範例：北風阿柏" value="北風阿柏" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-4 py-3 text-white text-sm outline-none transition" />
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="savePlayerName()" class="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-sm shadow-lg shadow-sky-500/20 transition">
+          啟程解鎖超能力
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 彈窗 2：收集技能「輸入解鎖碼」 ================= -->
+  <div id="unlockModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-sky-700/80 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative space-y-6">
+      
+      <button onclick="closeUnlockModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 mx-auto rounded-2xl bg-sky-950 border border-sky-500/40 flex items-center justify-center text-sky-400">
+          <i data-lucide="compass" class="w-6 h-6 animate-spin" style="animation-duration: 12s;"></i>
+        </div>
+        <h3 class="text-xl sm:text-2xl font-black text-white">聽完故事請輸入解鎖碼</h3>
+        <p class="text-xs text-slate-400">請輸入故事中獲得的「卡片編號」，即可解鎖隱藏卡片。</p>
+      </div>
+
+      <!-- 輸入區塊 -->
+      <div class="space-y-3">
+        <div class="relative">
+          <input id="unlockCodeInput" type="text" placeholder="請輸入卡片解鎖碼 (例如：B798、B837...)" class="w-full bg-slate-950 border-2 border-slate-700 focus:border-sky-400 rounded-2xl px-5 py-4 text-white text-base font-mono uppercase tracking-wider outline-none transition placeholder:text-slate-600" onkeydown="if(event.key === 'Enter') attemptUnlock();" />
+          <button onclick="attemptUnlock()" class="absolute right-2 top-2 bottom-2 px-5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-sm flex items-center space-x-1 shadow-md transition">
+            <span>解鎖</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+        
+        <div id="unlockErrorMsg" class="text-xs text-rose-400 hidden flex items-center space-x-1">
+          <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+          <span id="unlockErrorText">找不到對應的卡片編號，請再檢查一次！</span>
+        </div>
+      </div>
+
+      <!-- 提示說明 -->
+      <div class="bg-slate-950/40 rounded-2xl p-4 border border-slate-800 text-xs text-slate-400 flex items-start space-x-2.5">
+        <i data-lucide="sparkles" class="w-4 h-4 text-sky-400 flex-shrink-0 mt-0.5"></i>
+        <span>聽完校園故事後獲得的卡片解鎖碼（例如：B798、B837...），輸入正確即可喚醒專屬超能力！</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= 彈窗 3：卡片跳出展示 & 存入技能庫 (完全依據附圖樣式) ================= -->
+  <div id="cardRevealModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="max-w-xl w-full my-auto space-y-6 flex flex-col items-center">
+      
+      <!-- 解鎖卡片本體 (完全復刻附圖) -->
+      <div id="revealedCardElement" class="w-full max-w-[480px] rounded-2xl p-5 md:p-6 card-texture-bg text-slate-900 select-none relative transition-all duration-500 transform hover:scale-[1.01]">
+        
+        <!-- 卡片頂部白色邊框條 (三格：系列、隱藏技能名稱、卡片編號) -->
+        <div class="card-top-bar rounded-md px-2 py-2 mb-5">
+          <!-- 四個角的復古小圓飾點 -->
+          <div class="corner-pin corner-pin-tl"></div>
+          <div class="corner-pin corner-pin-tr"></div>
+          <div class="corner-pin corner-pin-bl"></div>
+          <div class="corner-pin corner-pin-br"></div>
+
+          <div class="grid grid-cols-12 items-center text-center font-bold">
+            <!-- 左格：系列 -->
+            <div class="col-span-3 top-bar-divider pr-1">
+              <span id="revealedCardSeriesTop" class="text-xs sm:text-sm md:text-base tracking-tight font-black text-slate-900 block truncate">
+                破風應變系
+              </span>
+            </div>
+            
+            <!-- 中格：隱藏技能名稱 -->
+            <div class="col-span-6 top-bar-divider px-1">
+              <span id="revealedCardSkillTop" class="text-sm sm:text-base md:text-lg font-black tracking-normal text-slate-950 block truncate">
+                風暴直覺感知
+              </span>
+            </div>
+
+            <!-- 右格：卡片編號 -->
+            <div class="col-span-3 pl-1 font-mono">
+              <span id="revealedCardCodeTop" class="text-xs sm:text-sm md:text-base font-bold text-slate-800 block truncate">
+                BF-101
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 下方系列的圖示大矩形框 (對應附圖中的淺灰矩形框) -->
+        <div class="card-illustration-frame rounded-md w-full h-[230px] sm:h-[260px] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+          
+          <!-- 系列大徽章圖示 (由 JS 依據系列動態渲染專屬精美向量圖) -->
+          <div id="revealedCardIconContainer" class="w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center transition-all duration-500 drop-shadow-md">
+            <!-- SVG ICON -->
+          </div>
+
+          <!-- 底部標籤：學生姓名與系列微標 -->
+          <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs font-semibold text-slate-700 bg-white/40 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/60">
+            <span class="flex items-center space-x-1">
+              <span>學員：</span>
+              <strong id="revealedCardStudent" class="text-slate-900 font-bold">涂子宥</strong>
+            </span>
+            <span id="revealedCardSeriesTag" class="text-[11px] px-2 py-0.5 rounded bg-slate-900/10 text-slate-900 font-bold">
+              系列圖騰
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 下方操作操作區：4. 卡片跳出後，出現「存入技能庫」並讓玩家選擇系列 -->
+      <div class="bg-slate-900 border border-sky-800/80 rounded-2xl p-5 w-full max-w-[480px] shadow-xl space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-sky-300 mb-1.5">
+            選擇存入的系列庫類別：
+          </label>
+          <!-- 六大系列直接平鋪列出 (非下拉式選單) -->
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] text-slate-400">請直接點選想要歸類的系列：</span>
+            <span id="selectedSeriesDisplayBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-600">
+              破風應變系
+            </span>
+          </div>
+
+          <div id="seriesSelectGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <button type="button" onclick="selectSeriesTarget('破風應變系')" data-series="破風應變系" class="series-target-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-sky-400 text-xs font-bold transition flex items-center justify-between group">
+              <span class="flex items-center space-x-2">
+                <span class="text-base group-hover:scale-110 transition">🌪️</span>
+                <span>破風應變系</span>
+              </span>
+              <span class="check-icon hidden text-sky-400 font-black">✓</span>
+            </button>
+            <button type="button" onclick="selectSeriesTarget('逆風探知系')" data-series="逆風探知系" class="series-target-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-sky-400 text-xs font-bold transition flex items-center justify-between group">
+              <span class="flex items-center space-x-2">
+                <span class="text-base group-hover:scale-110 transition">👁️</span>
+                <span>逆風探知系</span>
+              </span>
+              <span class="check-icon hidden text-sky-400 font-black">✓</span>
+            </button>
+            <button type="button" onclick="selectSeriesTarget('聚風共振系')" data-series="聚風共振系" class="series-target-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-sky-400 text-xs font-bold transition flex items-center justify-between group">
+              <span class="flex items-center space-x-2">
+                <span class="text-base group-hover:scale-110 transition">🔔</span>
+                <span>聚風共振系</span>
+              </span>
+              <span class="check-icon hidden text-sky-400 font-black">✓</span>
+            </button>
+            <button type="button" onclick="selectSeriesTarget('御風平衡系')" data-series="御風平衡系" class="series-target-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-sky-400 text-xs font-bold transition flex items-center justify-between group">
+              <span class="flex items-center space-x-2">
+                <span class="text-base group-hover:scale-110 transition">⚖️</span>
+                <span>御風平衡系</span>
+              </span>
+              <span class="check-icon hidden text-sky-400 font-black">✓</span>
+            </button>
+            <button type="button" onclick="selectSeriesTarget('疾風具現系')" data-series="疾風具現系" class="series-target-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-sky-400 text-xs font-bold transition flex items-center justify-between group">
+              <span class="flex items-center space-x-2">
+                <span class="text-base group-hover:scale-110 transition">🗡️</span>
+                <span>疾風具現系</span>
+              </span>
+              <span class="check-icon hidden text-sky-400 font-black">✓</span>
+            </button>
+            <button type="button" onclick="selectSeriesTarget('北風異能系')" data-series="北風異能系" class="series-target-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-sky-400 text-xs font-bold transition flex items-center justify-between group">
+              <span class="flex items-center space-x-2">
+                <span class="text-base group-hover:scale-110 transition">❄️</span>
+                <span>北風異能系</span>
+              </span>
+              <span class="check-icon hidden text-sky-400 font-black">✓</span>
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">系統已依據卡片特性預先建議，你亦可依自身理解指定分類。</p>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="commitCardToVault()" class="flex-1 py-3 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 transition">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>存入技能庫</span>
+          </button>
+          <button onclick="closeCardRevealModal()" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+            暫不存入
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= 彈窗 4：5.「技能庫」六大系列檢視 ================= -->
+  <div id="skillVaultModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden">
+    <div class="bg-slate-900 border border-sky-800/80 rounded-3xl w-full max-w-5xl h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- 技能庫頂部 -->
+      <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div>
+          <div class="flex items-center space-x-2">
+            <i data-lucide="layers" class="w-5 h-5 text-sky-400"></i>
+            <h3 class="text-lg sm:text-xl font-black text-white">北風學院・個人技能庫</h3>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">
+            挑戰者：<span class="text-amber-300 font-bold" id="vaultPlayerName">北風阿柏</span> ｜ 已解鎖 <strong id="vaultCountText" class="text-sky-300">0</strong> / 12 張技能卡
+          </p>
+        </div>
+        <button onclick="closeSkillVaultModal()" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- 系列分類頁籤 (六大系列切換) -->
+      <div class="px-4 sm:px-6 py-3 border-b border-slate-800 bg-slate-950/30 flex items-center space-x-2 overflow-x-auto no-scrollbar">
+        <button onclick="switchVaultTab('ALL')" id="tab-ALL" class="vault-tab-btn px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap bg-sky-500 text-slate-950 shadow-sm">
+          全部 (0)
+        </button>
+        <button onclick="switchVaultTab('破風應變系')" id="tab-破風應變系" class="vault-tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+          破風應變系 (0)
+        </button>
+        <button onclick="switchVaultTab('逆風探知系')" id="tab-逆風探知系" class="vault-tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+          逆風探知系 (0)
+        </button>
+        <button onclick="switchVaultTab('聚風共振系')" id="tab-聚風共振系" class="vault-tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+          聚風共振系 (0)
+        </button>
+        <button onclick="switchVaultTab('御風平衡系')" id="tab-御風平衡系" class="vault-tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+          御風平衡系 (0)
+        </button>
+        <button onclick="switchVaultTab('疾風具現系')" id="tab-疾風具現系" class="vault-tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+          疾風具現系 (0)
+        </button>
+        <button onclick="switchVaultTab('北風異能系')" id="tab-北風異能系" class="vault-tab-btn px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:bg-slate-800 transition whitespace-nowrap">
+          北風異能系 (0)
+        </button>
+      </div>
+
+      <!-- 卡片網格列表容器 -->
+      <div id="vaultCardsGrid" class="flex-grow p-4 sm:p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+        <!-- JS 動態渲染卡片列表 -->
+      </div>
+
+      <!-- 技能庫底部動作 -->
+      <div class="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs text-slate-400">
+        <span>點擊卡片可放大檢視詳情</span>
+        <button onclick="openUnlockModal(); closeSkillVaultModal();" class="text-sky-400 hover:text-sky-300 font-bold flex items-center space-x-1">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>前往輸入新解鎖碼</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= 彈窗 5：滿額 12 張「任務完成，兌換獎品」 ================= -->
+  <div id="rewardModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gradient-to-b from-slate-900 to-sky-950 border-2 border-amber-400 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative text-center space-y-6">
+      
+      <button onclick="closeRewardModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- 獎章圖騰 -->
+      <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 shadow-xl shadow-amber-500/40 animate-bounce">
+        <i data-lucide="trophy" class="w-10 h-10"></i>
+      </div>
+
+      <div>
+        <div class="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 font-bold text-xs tracking-widest mb-2 border border-amber-400/30">
+          ★ 任務圓滿達成 ★
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-white">
+          恭喜解鎖 12 項隱藏超能力！
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-300 mt-2">
+          你已完整灌注北風能量小人，喚醒了屬於你的風系天賦全圖騰！
+        </p>
+      </div>
+
+      <!-- 兌換憑證卡片 -->
+      <div class="bg-slate-950/80 border border-amber-400/40 rounded-2xl p-5 text-left space-y-3 relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+          <span class="text-xs text-slate-400">榮譽學員：<strong id="rewardPlayerName" class="text-white">北風阿柏</strong></span>
+          <span class="text-xs text-amber-400 font-mono font-bold">認證碼：#BOREAS-12-MAX</span>
+        </div>
+        <div class="text-xs text-slate-300 space-y-1">
+          <p class="font-bold text-white text-sm">【北風學院 實體超能紀念獎品兌換券】</p>
+          <p>• 獎品領取方式：請向學院導師出示此畫面截圖。</p>
+          <p>• 達成成就：蒐集完畢 12 張隱藏版超能力卡片，已注入終極風能。</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="triggerConfetti()" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-sm shadow-lg shadow-amber-500/30 transition">
+          再次慶祝 🎉
+        </button>
+        <button onclick="closeRewardModal()" class="py-3 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
+          關閉
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= 彈窗 6：0. 後台資料庫管理 (支援自訂新增/試算表覆蓋) ================= -->
+  <div id="databaseModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- 頂部 -->
+      <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+        <div>
+          <div class="flex items-center space-x-2">
+            <i data-lucide="database" class="w-5 h-5 text-sky-400"></i>
+            <h3 class="text-lg font-black text-white">後台解鎖卡資料庫管理</h3>
+          </div>
+          <p class="text-xs text-slate-400">
+            包含學生姓名、卡片編號、系列、技能名稱。稍後有試算表可直接一鍵匯入。
+          </p>
+        </div>
+        <button onclick="closeDatabaseModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- 快速操作工具列 -->
+      <div class="p-4 border-b border-slate-800 bg-slate-950/30 flex flex-wrap gap-2 items-center justify-between text-xs">
+        <div class="flex gap-2">
+          <button onclick="showImportView(false)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition">
+            卡片清單 (<span id="dbTotalCount">0</span>)
+          </button>
+          <button onclick="showImportView(true)" class="px-3 py-1.5 rounded-lg bg-sky-950 text-sky-300 border border-sky-800 hover:bg-sky-900 font-semibold transition">
+            匯入/貼上試算表 CSV
+          </button>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="resetToDefaultDatabase()" class="px-3 py-1.5 rounded-lg bg-rose-950 text-rose-300 border border-rose-800 hover:bg-rose-900 font-semibold transition">
+            重設為範例資料庫
+          </button>
+        </div>
+      </div>
+
+      <!-- 內容視圖 1：清單檢視 -->
+      <div id="dbListView" class="flex-grow p-4 overflow-y-auto">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-400">
+                <th class="p-2.5 font-bold">卡片編號 (解鎖碼)</th>
+                <th class="p-2.5 font-bold">技能名稱</th>
+                <th class="p-2.5 font-bold">預設系列</th>
+                <th class="p-2.5 font-bold">學生姓名</th>
+                <th class="p-2.5 font-bold text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="databaseTableBody" class="divide-y divide-slate-800/60 font-mono">
+              <!-- JS 動態載入 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 內容視圖 2：試算表文字貼上匯入 -->
+      <div id="dbImportView" class="flex-grow p-5 overflow-y-auto hidden flex flex-col space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">
+            貼上 Google 試算表或 CSV 內容 (格式：卡片編號, 技能名稱, 系列, 學生姓名)
+          </label>
+          <p class="text-[11px] text-slate-500 mb-2">每一行代表一張卡，支援 Tab 分隔或逗號分隔，貼上後點擊匯入即可即時生效。</p>
+          <textarea id="importCsvTextarea" rows="10" placeholder="BF-101, 風暴直覺感知, 破風應變系, 涂子宥
+BF-102, 破曉突圍意志, 破風應變系, 黃可馨
+BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono outline-none focus:border-sky-400"></textarea>
+        </div>
+        <button onclick="handleCsvImport()" class="py-2.5 px-5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs self-start shadow-md transition">
+          確認匯入並套用至資料庫
+        </button>
+      </div>
+
+      <!-- 底部關閉按鈕 -->
+      <div class="p-4 border-t border-slate-800 bg-slate-950/70 flex justify-end">
+        <button onclick="closeDatabaseModal()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs">
+          完成
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= 頁尾 ================= -->
+  <footer class="border-t border-sky-950/60 bg-slate-950/60 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>北風學院 Boreas Academy © 隱藏技能解鎖庫</div>
+      <div class="flex items-center space-x-3 text-slate-400">
+        <button onclick="resetPlayerProgress()" class="hover:text-rose-400 transition underline text-[11px]">
+          清空當前收集進度
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= 核心邏輯腳本 ================= -->
+  <script>
+    /* ============================================================
+       0. 七大系列定義與專屬 SVG 徽章設計
+       七系列：破風應變系、逆風探知系、聚風共振系、御風平衡系、疾風具現系、北風異能系、未知
+       ============================================================ */
+    const SERIES_ICONS = {
+      '破風應變系': `
+        <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 破風之刃與突圍銳角 -->
+          <circle cx="50" cy="50" r="44" stroke="#1e3a53" stroke-width="3" stroke-dasharray="6 4" />
+          <path d="M 20,70 L 60,20 L 52,50 L 80,45 L 35,85 L 42,58 Z" fill="#20415a" stroke="#0e2338" stroke-width="2.5" />
+          <path d="M 15,35 Q 35,25 50,30" stroke="#0e2338" stroke-width="3" stroke-linecap="round" />
+          <path d="M 25,82 Q 55,75 82,65" stroke="#0e2338" stroke-width="3" stroke-linecap="round" />
+          <circle cx="60" cy="20" r="3" fill="#0e2338" />
+        </svg>
+      `,
+      '逆風探知系': `
+        <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 逆流之眼與探知風針 -->
+          <circle cx="50" cy="50" r="44" stroke="#1e3a53" stroke-width="3" />
+          <path d="M 18,50 Q 50,15 82,50 Q 50,85 18,50 Z" stroke="#0e2338" stroke-width="3.5" fill="#20415a" fill-opacity="0.3" />
+          <circle cx="50" cy="50" r="14" fill="#20415a" stroke="#0e2338" stroke-width="2.5" />
+          <circle cx="50" cy="50" r="5" fill="#edf5f9" />
+          <!-- 逆向氣流旋渦弧線 -->
+          <path d="M 30,22 Q 15,40 28,68" stroke="#0e2338" stroke-width="2.5" stroke-linecap="round" />
+          <path d="M 70,78 Q 85,60 72,32" stroke="#0e2338" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      `,
+      '聚風共振系': `
+        <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 雙重風環共振波紋 -->
+          <circle cx="50" cy="50" r="42" stroke="#1e3a53" stroke-width="2.5" />
+          <circle cx="38" cy="50" r="22" stroke="#0e2338" stroke-width="3" fill="#20415a" fill-opacity="0.25" />
+          <circle cx="62" cy="50" r="22" stroke="#0e2338" stroke-width="3" fill="#20415a" fill-opacity="0.25" />
+          <!-- 共振核心音波 -->
+          <line x1="50" y1="20" x2="50" y2="80" stroke="#0e2338" stroke-width="3" stroke-linecap="round" />
+          <path d="M 50,35 Q 70,50 50,65" fill="#20415a" stroke="#0e2338" stroke-width="2" />
+          <path d="M 50,35 Q 30,50 50,65" fill="#20415a" stroke="#0e2338" stroke-width="2" />
+        </svg>
+      `,
+      '御風平衡系': `
+        <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 天平與太極風儀 -->
+          <circle cx="50" cy="50" r="44" stroke="#1e3a53" stroke-width="3" />
+          <!-- 橫梁 -->
+          <line x1="20" y1="42" x2="80" y2="42" stroke="#0e2338" stroke-width="3.5" stroke-linecap="round" />
+          <line x1="50" y1="22" x2="50" y2="78" stroke="#0e2338" stroke-width="3.5" stroke-linecap="round" />
+          <!-- 左右風翼盤 -->
+          <path d="M 20,42 L 15,62 Q 25,68 35,62 Z" fill="#20415a" stroke="#0e2338" stroke-width="2" />
+          <path d="M 80,42 L 65,62 Q 75,68 85,62 Z" fill="#20415a" stroke="#0e2338" stroke-width="2" />
+          <!-- 頂部平衡星 -->
+          <circle cx="50" cy="22" r="5" fill="#edf5f9" stroke="#0e2338" stroke-width="2.5" />
+          <path d="M 38,78 Q 50,86 62,78" stroke="#0e2338" stroke-width="3" stroke-linecap="round" />
+        </svg>
+      `,
+      '疾風具現系': `
+        <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 八芒風晶與利刃實體化 -->
+          <circle cx="50" cy="50" r="44" stroke="#1e3a53" stroke-width="2.5" stroke-dasharray="4 4" />
+          <!-- 凝聚風晶菱形 -->
+          <polygon points="50,14 62,38 86,50 62,62 50,86 38,62 14,50 38,38" fill="#20415a" stroke="#0e2338" stroke-width="3" />
+          <polygon points="50,28 58,42 72,50 58,58 50,72 42,58 28,50 42,42" fill="#edf5f9" stroke="#0e2338" stroke-width="1.5" />
+          <circle cx="50" cy="50" r="4" fill="#0e2338" />
+        </svg>
+      `,
+      '北風異能系': `
+        <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 北極星與異界星軌奧秘 -->
+          <circle cx="50" cy="50" r="44" stroke="#1e3a53" stroke-width="3" />
+          <!-- 星軌交疊 -->
+          <ellipse cx="50" cy="50" rx="42" ry="16" transform="rotate(30 50 50)" stroke="#0e2338" stroke-width="2" />
+          <ellipse cx="50" cy="50" rx="42" ry="16" transform="rotate(-30 50 50)" stroke="#0e2338" stroke-width="2" />
+          <!-- 六芒極光風芒 -->
+          <path d="M 50,15 L 50,85 M 15,50 L 85,50" stroke="#0e2338" stroke-width="3" stroke-linecap="round" />
+          <polygon points="50,22 56,44 78,50 56,56 50,78 44,56 22,50 44,44" fill="#20415a" stroke="#0e2338" stroke-width="2" />
+          <circle cx="50" cy="50" r="5" fill="#edf5f9" stroke="#0e2338" stroke-width="2" />
+        </svg>
+      `,
+      '未知': `
+        <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 神秘漩渦問號與星塵迷霧 -->
+          <circle cx="50" cy="50" r="44" stroke="#1e3a53" stroke-width="2.5" stroke-dasharray="5 5" />
+          <path d="M 40,35 C 40,25 60,25 60,35 C 60,45 50,48 50,60" stroke="#0e2338" stroke-width="5" stroke-linecap="round" fill="none" />
+          <circle cx="50" cy="74" r="4" fill="#0e2338" />
+          <path d="M 22,22 Q 50,5 78,22" stroke="#20415a" stroke-width="2" stroke-linecap="round" />
+          <path d="M 22,78 Q 50,95 78,78" stroke="#20415a" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      `
+    };
+
+    /* ============================================================
+       預設解鎖卡資料庫 (包含學生姓名、卡片編號、系列、技能名稱)
+       ============================================================ */
+    const DEFAULT_DATABASE = [
+  {
+    "code": "B798",
+    "studentName": "黃可馨",
+    "skillName": "陌生中找熟悉",
+    "series": "未知"
+  },
+  {
+    "code": "B797",
+    "studentName": "李宛頤",
+    "skillName": "矇眼鬼抓人",
+    "series": "未知"
+  },
+  {
+    "code": "B796",
+    "studentName": "盧愛心",
+    "skillName": "學院生活初體驗",
+    "series": "逆風探知系"
+  },
+  {
+    "code": "B785",
+    "studentName": "何樂",
+    "skillName": "封印視覺大亂鬥",
+    "series": "逆風探知系"
+  },
+  {
+    "code": "B784",
+    "studentName": "萊俐理",
+    "skillName": "社恐突破指南",
+    "series": "聚風共振系"
+  },
+  {
+    "code": "B783",
+    "studentName": "陳妍荻",
+    "skillName": "合作",
+    "series": "破風應變系"
+  },
+  {
+    "code": "B762",
+    "studentName": "楊翎又",
+    "skillName": "人類們",
+    "series": "未知"
+  },
+  {
+    "code": "B761",
+    "studentName": "鍾勻浩",
+    "skillName": "交朋友之術",
+    "series": "破風應變系"
+  },
+  {
+    "code": "B750",
+    "studentName": "楊靖鈞",
+    "skillName": "嶄新的生活！",
+    "series": "破風應變系"
+  },
+  {
+    "code": "B749",
+    "studentName": "涂子宥",
+    "skillName": "神秘的郵件",
+    "series": "聚風共振系"
+  },
+  {
+    "code": "B748",
+    "studentName": "林祐廷",
+    "skillName": "尷尬破解術",
+    "series": "破風應變系"
+  },
+  {
+    "code": "B837",
+    "studentName": "朱恩圻",
+    "skillName": "回憶連結術",
+    "series": "聚風共振系"
+  },
+  {
+    "code": "B836",
+    "studentName": "姜宜辰",
+    "skillName": "共振熱流",
+    "series": "聚風共振系"
+  },
+  {
+    "code": "B835",
+    "studentName": "張允薰",
+    "skillName": "年級代表漂流記",
+    "series": "逆風探知系"
+  },
+  {
+    "code": "B824",
+    "studentName": "曹凱棻",
+    "skillName": "異能力：人間協奏曲",
+    "series": "逆風探知系"
+  },
+  {
+    "code": "B823",
+    "studentName": "陳星潔",
+    "skillName": "奇怪計謀",
+    "series": "破風應變系"
+  },
+  {
+    "code": "B822",
+    "studentName": "劉恩裴",
+    "skillName": "陌生人聚集的506號室",
+    "series": "破風應變系"
+  },
+  {
+    "code": "B811",
+    "studentName": "陳郁筌",
+    "skillName": "開學第一天冒險",
+    "series": "未知"
+  },
+  {
+    "code": "B810",
+    "studentName": "李耘瑍",
+    "skillName": "閱讀，風走過的痕跡",
+    "series": "御風平衡系"
+  },
+  {
+    "code": "B809",
+    "studentName": "俞鴻彥",
+    "skillName": "變形術",
+    "series": "未知"
+  },
+  {
+    "code": "B898",
+    "studentName": "張哲語",
+    "skillName": "一大堆小人",
+    "series": "未知"
+  },
+  {
+    "code": "B897",
+    "studentName": "翁翊扉",
+    "skillName": "咒·終究還是要參與活動",
+    "series": "逆風探知系"
+  },
+  {
+    "code": "B996",
+    "studentName": "吳婕語",
+    "skillName": "萬聖節裝扮",
+    "series": "疾風具現系"
+  },
+  {
+    "code": "B985",
+    "studentName": "李心恬",
+    "skillName": "異世界登入術",
+    "series": "破風應變系"
+  },
+  {
+    "code": "B984",
+    "studentName": "石展成",
+    "skillName": "全場漫步結界",
+    "series": "御風平衡系"
+  },
+  {
+    "code": "B973",
+    "studentName": "蔡丞皓",
+    "skillName": "合法放電領域",
+    "series": "破風應變系"
+  },
+  {
+    "code": "B972",
+    "studentName": "蔡翔宇",
+    "skillName": "腦袋轉彎飄移",
+    "series": "北風異能系"
+  },
+  {
+    "code": "B971",
+    "studentName": "黃祈翔",
+    "skillName": "自己人召喚術",
+    "series": "聚風共振系"
+  },
+  {
+    "code": "B960",
+    "studentName": "周榆庭",
+    "skillName": "對有同步提升",
+    "series": "聚風共振系"
+  },
+  {
+    "code": "B059",
+    "studentName": "秉鈞.念宇.先亞.語恬.初淨.亮希.勻瑨",
+    "skillName": "「虫合？」",
+    "series": "未知"
+  },
+  {
+    "code": "B058",
+    "studentName": "秉鈞.念宇.先亞.語恬.初淨.亮希.勻瑨",
+    "skillName": "無腦攻頂術",
+    "series": "未知"
+  },
+  {
+    "code": "B047",
+    "studentName": "秉鈞.念宇.先亞.語恬.初淨.亮希.勻瑨",
+    "skillName": "電路擾亂術",
+    "series": "未知"
+  },
+  {
+    "code": "B046",
+    "studentName": "秉鈞.念宇.先亞.語恬.初淨.亮希.勻瑨",
+    "skillName": "最佳破冰術",
+    "series": "未知"
+  },
+  {
+    "code": "B035",
+    "studentName": "秉鈞.念宇.先亞.語恬.初淨.亮希.勻瑨",
+    "skillName": "里長句點術",
+    "series": "未知"
+  },
+  {
+    "code": "B034",
+    "studentName": "彥希.沛恩.楷崴.議中.善理.絮嘉.紫榆.天野",
+    "skillName": "活動策劃術",
+    "series": "未知"
+  },
+  {
+    "code": "B023",
+    "studentName": "彥希.沛恩.楷崴.議中.善理.絮嘉.紫榆.天野",
+    "skillName": "洗腦說服術",
+    "series": "未知"
+  },
+  {
+    "code": "B022",
+    "studentName": "彥希.沛恩.楷崴.議中.善理.絮嘉.紫榆.天野",
+    "skillName": "神筆創造術",
+    "series": "未知"
+  },
+  {
+    "code": "B021",
+    "studentName": "彥希.沛恩.楷崴.議中.善理.絮嘉.紫榆.天野",
+    "skillName": "真相推理眼",
+    "series": "未知"
+  },
+  {
+    "code": "B010",
+    "studentName": "彥希.沛恩.楷崴.議中.善理.絮嘉.紫榆.天野",
+    "skillName": "跨界合作術",
+    "series": "未知"
+  }
+];
+
+    /* ============================================================
+       應用程式狀態管理 (LocalStorage 永久存取)
+       ============================================================ */
+    const STORAGE_KEY_DB = 'BOREAS_CARDS_DATABASE_V2';
+    const STORAGE_KEY_PLAYER = 'BOREAS_PLAYER_NAME_V1';
+    const STORAGE_KEY_VAULT = 'BOREAS_PLAYER_VAULT_V1';
+
+    let cardDatabase = [];
+    let currentPlayerName = "北風阿柏";
+    let playerVault = []; // 玩家收集的卡片清單: [{ code, skillName, series, studentName, savedSeries, unlockedAt }]
+    let tempRevealedCard = null;
+    let currentSelectedTargetSeries = '破風應變系';
+
+    function selectSeriesTarget(seriesName) {
+      currentSelectedTargetSeries = seriesName;
+      document.getElementById('selectedSeriesDisplayBadge').textContent = seriesName;
+      
+      const buttons = document.querySelectorAll('.series-target-btn');
+      buttons.forEach(btn => {
+        const sName = btn.getAttribute('data-series');
+        const checkIcon = btn.querySelector('.check-icon');
+        if (sName === seriesName) {
+          btn.className = 'series-target-btn p-3 rounded-xl border-2 border-sky-400 bg-sky-950/70 text-sky-200 shadow-md shadow-sky-500/20 text-xs font-bold transition flex items-center justify-between group';
+          if (checkIcon) checkIcon.classList.remove('hidden');
+        } else {
+          btn.className = 'series-target-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-slate-500 text-slate-300 text-xs font-bold transition flex items-center justify-between group';
+          if (checkIcon) checkIcon.classList.add('hidden');
+        }
+      });
+    }
+ // 當前解鎖但尚未存入的卡片
+
+    // 初始化載入
+    function initApp() {
+      // 1. 載入資料庫
+      const savedDb = localStorage.getItem(STORAGE_KEY_DB);
+      if (savedDb) {
+        try {
+          cardDatabase = JSON.parse(savedDb);
+        } catch(e) {
+          cardDatabase = [...DEFAULT_DATABASE];
+        }
+      } else {
+        cardDatabase = [...DEFAULT_DATABASE];
+        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(cardDatabase));
+      }
+
+      // 2. 載入玩家名稱
+      const savedPlayer = localStorage.getItem(STORAGE_KEY_PLAYER);
+      if (savedPlayer) {
+        currentPlayerName = savedPlayer;
+      }
+      updatePlayerNameUI();
+
+      // 3. 載入已收集卡片
+      const savedVault = localStorage.getItem(STORAGE_KEY_VAULT);
+      if (savedVault) {
+        try {
+          playerVault = JSON.parse(savedVault);
+        } catch(e) {
+          playerVault = [];
+        }
+      }
+
+      // 4. 渲染進度與主介面
+      renderProgressUI();
+      renderQuickSeriesStats();
+      populateSampleCodes();
+      renderDatabaseTable();
+
+      // 初始化圖標
+      lucide.createIcons();
+
+      // 3. 一進來先跳出打名字的框框
+      openNameModal();
+    }
+
+    /* ============================================================
+       挑戰者姓名邏輯
+       ============================================================ */
+    function openNameModal() {
+      document.getElementById('playerNameInput').value = currentPlayerName;
+      document.getElementById('nameModal').classList.remove('hidden');
+    }
+
+    function savePlayerName() {
+      const input = document.getElementById('playerNameInput').value.trim();
+      if (!input) {
+        alert("請輸入挑戰者姓名！");
+        return;
+      }
+      currentPlayerName = input;
+      localStorage.setItem(STORAGE_KEY_PLAYER, currentPlayerName);
+      updatePlayerNameUI();
+      document.getElementById('nameModal').classList.remove('hidden');
+      document.getElementById('nameModal').classList.add('hidden');
+    }
+
+    function updatePlayerNameUI() {
+      document.getElementById('headerPlayerName').textContent = currentPlayerName;
+      document.getElementById('vaultPlayerName').textContent = currentPlayerName;
+      document.getElementById('rewardPlayerName').textContent = currentPlayerName;
+    }
+
+    /* ============================================================
+       區塊 6：進度條（人型小人能量體，每張卡片充能一點，滿 12 張）
+       ============================================================ */
+    function renderProgressUI() {
+      const count = playerVault.length;
+      const target = 12;
+      const percent = Math.min(100, Math.round((count / target) * 100));
+
+      // 更新徽章與百分比
+      document.getElementById('progressBadge').textContent = `${count} / ${target}`;
+      document.getElementById('progressPercent').textContent = `${percent}%`;
+      document.getElementById('progressBarFill').style.width = `${percent}%`;
+      document.getElementById('vaultCountText').textContent = count;
+
+      // 小人人體 SVG 充能高度 (SVG 總高 320，底部在 320，充能由 320 往 0 減少)
+      const energyRect = document.getElementById('energyLevelRect');
+      const waveLine = document.getElementById('energyWaveLine');
+      const humanoidSvg = document.getElementById('humanoidSvg');
+      const fullPowerBadge = document.getElementById('fullPowerBadge');
+      const redeemQuickBtn = document.getElementById('redeemQuickBtnContainer');
+      const statusText = document.getElementById('progressStatusText');
+
+      // 依比例算 y 座標
+      const fillHeight = (count / target) * 320;
+      const yPosition = 320 - fillHeight;
+
+      energyRect.setAttribute('y', yPosition);
+      energyRect.setAttribute('height', fillHeight);
+      waveLine.setAttribute('y1', yPosition);
+      waveLine.setAttribute('y2', yPosition);
+
+      // 更新 12 個星芒能量節點
+      for (let i = 1; i <= 12; i++) {
+        const node = document.getElementById(`node-${i}`);
+        if (node) {
+          if (i <= count) {
+            node.setAttribute('fill', '#fde047');
+            node.setAttribute('r', '6');
+            node.setAttribute('filter', 'drop-shadow(0 0 6px #facc15)');
+          } else {
+            node.setAttribute('fill', '#334155');
+            node.setAttribute('r', (i === 7 || i === 8 || i === 11 || i === 12) ? '5' : '4');
+            node.removeAttribute('filter');
+          }
+        }
+      }
+
+      // 滿 12 張判定
+      if (count >= target) {
+        energyRect.setAttribute('fill', 'url(#fullPowerGrad)');
+        humanoidSvg.classList.add('super-energy-glow');
+        humanoidSvg.classList.remove('energy-glow');
+        fullPowerBadge.classList.remove('hidden');
+        redeemQuickBtn.classList.remove('hidden');
+        statusText.innerHTML = `<span class="text-amber-300 font-bold">✨ 能量已完全灌注！恭喜達成 12 張超能力收集！</span>`;
+      } else if (count > 0) {
+        energyRect.setAttribute('fill', 'url(#energyFillGrad)');
+        humanoidSvg.classList.add('energy-glow');
+        humanoidSvg.classList.remove('super-energy-glow');
+        fullPowerBadge.classList.add('hidden');
+        redeemQuickBtn.classList.add('hidden');
+        statusText.innerHTML = `已收集 ${count} 張，身體能量正在覺醒，還差 ${target - count} 張即可領獎！`;
+      } else {
+        humanoidSvg.classList.remove('energy-glow', 'super-energy-glow');
+        fullPowerBadge.classList.add('hidden');
+        redeemQuickBtn.classList.add('hidden');
+        statusText.innerHTML = `小人身體尚在沉睡，請輸入解鎖碼注入技能能量...`;
+      }
+    }
+
+    /* ============================================================
+       區塊 3：收集技能（輸入解鎖碼）
+       ============================================================ */
+    function openUnlockModal() {
+      document.getElementById('unlockCodeInput').value = '';
+      document.getElementById('unlockErrorMsg').classList.add('hidden');
+      document.getElementById('unlockModal').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('unlockCodeInput').focus();
+      }, 100);
+    }
+
+    function closeUnlockModal() {
+      document.getElementById('unlockModal').classList.add('hidden');
+    }
+
+    function populateSampleCodes() {
+      const container = document.getElementById('sampleCodesContainer');
+      container.innerHTML = '';
+      cardDatabase.slice(0, 10).forEach(card => {
+        const btn = document.createElement('button');
+        btn.className = "px-2 py-1 rounded bg-slate-800 hover:bg-sky-950 hover:text-sky-300 border border-slate-700 text-[11px] font-mono transition";
+        btn.textContent = card.code;
+        btn.onclick = () => {
+          document.getElementById('unlockCodeInput').value = card.code;
+          attemptUnlock();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function fillRandomCode() {
+      const randomCard = cardDatabase[Math.floor(Math.random() * cardDatabase.length)];
+      if (randomCard) {
+        document.getElementById('unlockCodeInput').value = randomCard.code;
+      }
+    }
+
+    function quickTestHint() {
+      openUnlockModal();
+    }
+
+    function attemptUnlock() {
+      const codeInput = document.getElementById('unlockCodeInput').value.trim();
+      const errBox = document.getElementById('unlockErrorMsg');
+      const errText = document.getElementById('unlockErrorText');
+
+      if (!codeInput) {
+        errText.textContent = "請先填寫卡片編號！";
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      // 在資料庫中尋找對應卡片 (忽略大小寫與前後空白)
+      const matched = cardDatabase.find(c => c.code.toLowerCase() === codeInput.toLowerCase());
+
+      if (!matched) {
+        errText.textContent = `查無編號「${codeInput}」的卡片，請確認故事解鎖碼是否正確！`;
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      // 檢查是否已經收集過
+      const alreadyCollected = playerVault.some(c => c.code.toLowerCase() === matched.code.toLowerCase());
+      if (alreadyCollected) {
+        errText.textContent = `卡片「${matched.code}・${matched.skillName}」已經存入你的技能庫中囉！`;
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      // 成功解鎖！
+      errBox.classList.add('hidden');
+      closeUnlockModal();
+
+      // 觸發音效/特效，並跳出卡片展示
+      triggerUnlockFx();
+      showRevealedCard(matched);
+    }
+
+    function triggerUnlockFx() {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.6 },
+        colors: ['#38bdf8', '#7dd3fc', '#fef08a', '#ffffff']
+      });
+    }
+
+    /* ============================================================
+       區塊 4：卡片跳出展示 & 存入技能庫
+       ============================================================ */
+    function showRevealedCard(card) {
+      tempRevealedCard = card;
+
+      // 更新卡片外觀 (完全參照附圖)
+      document.getElementById('revealedCardSeriesTop').textContent = card.series;
+      document.getElementById('revealedCardSkillTop').textContent = card.skillName;
+      document.getElementById('revealedCardCodeTop').textContent = card.code;
+      document.getElementById('revealedCardStudent').textContent = card.studentName || "學員";
+      document.getElementById('revealedCardSeriesTag').textContent = card.series;
+
+      // 載入該系列的專屬圖示 (若為未知或其他系列則動態容錯)
+      const iconSvg = SERIES_ICONS[card.series] || SERIES_ICONS['未知'];
+      document.getElementById('revealedCardIconContainer').innerHTML = iconSvg;
+
+      // 設定預設選擇的存入系列 (六個系列直接平鋪列出)
+      const targetOptions = ["破風應變系", "逆風探知系", "聚風共振系", "御風平衡系", "疾風具現系", "北風異能系"];
+      const defaultSeries = targetOptions.includes(card.series) ? card.series : "破風應變系";
+      selectSeriesTarget(defaultSeries);
+
+      // 顯示彈窗
+      document.getElementById('cardRevealModal').classList.remove('hidden');
+    }
+
+    function closeCardRevealModal() {
+      document.getElementById('cardRevealModal').classList.add('hidden');
+      tempRevealedCard = null;
+    }
+
+    // 存入技能庫操作
+    function commitCardToVault() {
+      if (!tempRevealedCard) return;
+
+      const chosenSeries = currentSelectedTargetSeries || "破風應變系";
+
+      const cardEntry = {
+        code: tempRevealedCard.code,
+        skillName: tempRevealedCard.skillName,
+        series: tempRevealedCard.series, // 原生系列
+        studentName: tempRevealedCard.studentName || "學員",
+        savedSeries: chosenSeries,       // 玩家指定存入的系列
+        unlockedAt: new Date().toISOString()
+      };
+
+      playerVault.push(cardEntry);
+      localStorage.setItem(STORAGE_KEY_VAULT, JSON.stringify(playerVault));
+
+      // 關閉展示彈窗
+      closeCardRevealModal();
+
+      // 更新主畫面
+      renderProgressUI();
+      renderQuickSeriesStats();
+
+      // 檢查是否達成 12 張！
+      if (playerVault.length === 12) {
+        setTimeout(() => {
+          showRewardModal();
+        }, 600);
+      } else {
+        // 小慶祝
+        confetti({
+          particleCount: 30,
+          spread: 45,
+          origin: { y: 0.7 }
+        });
+      }
+    }
+
+    /* ============================================================
+       區塊 5：技能庫（六大系列瀏覽）
+       ============================================================ */
+    let currentVaultTab = 'ALL';
+
+    function openSkillVaultModal() {
+      document.getElementById('skillVaultModal').classList.remove('hidden');
+      switchVaultTab(currentVaultTab);
+    }
+
+    function closeSkillVaultModal() {
+      document.getElementById('skillVaultModal').classList.add('hidden');
+    }
+
+    function switchVaultTab(tab) {
+      currentVaultTab = tab;
+
+      // 更新按鈕樣式
+      const buttons = document.querySelectorAll('.vault-tab-btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-sky-500', 'text-slate-950', 'shadow-sm', 'font-bold');
+        btn.classList.add('text-slate-300', 'font-medium');
+      });
+
+      const activeBtn = document.getElementById(`tab-${tab}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-sky-500', 'text-slate-950', 'shadow-sm', 'font-bold');
+        activeBtn.classList.remove('text-slate-300');
+      }
+
+      // 篩選卡片
+      let filtered = [];
+      if (tab === 'ALL') {
+        filtered = playerVault;
+      } else {
+        filtered = playerVault.filter(c => c.savedSeries === tab);
+      }
+
+      // 渲染卡片
+      renderVaultCards(filtered);
+      updateVaultTabCounts();
+    }
+
+    function updateVaultTabCounts() {
+      const allCount = playerVault.length;
+      document.getElementById('tab-ALL').textContent = `全部 (${allCount})`;
+
+      const seriesList = ["破風應變系", "逆風探知系", "聚風共振系", "御風平衡系", "疾風具現系", "北風異能系"];
+      seriesList.forEach(seriesName => {
+        const c = playerVault.filter(item => item.savedSeries === seriesName).length;
+        const btn = document.getElementById(`tab-${seriesName}`);
+        if (btn) {
+          btn.textContent = `${seriesName} (${c})`;
+        }
+      });
+    }
+
+    function renderVaultCards(cards) {
+      const grid = document.getElementById('vaultCardsGrid');
+      grid.innerHTML = '';
+
+      if (cards.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 flex flex-col items-center justify-center text-center text-slate-500 space-y-3">
+            <div class="w-16 h-16 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-400">
+              <i data-lucide="inbox" class="w-8 h-8"></i>
+            </div>
+            <div class="text-sm font-semibold text-slate-400">尚無此系列技能卡</div>
+            <p class="text-xs text-slate-500 max-w-xs">前往主頁面點擊「收集技能」並輸入解鎖碼，即可充能技能庫！</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      cards.forEach(card => {
+        const cardBox = document.createElement('div');
+        cardBox.className = "card-texture-bg rounded-xl p-3.5 border border-sky-400/20 shadow-md cursor-pointer hover:border-sky-400/70 transition transform hover:-translate-y-1 relative group";
+        
+        const iconSvg = SERIES_ICONS[card.series] || SERIES_ICONS['未知'];
+
+        cardBox.innerHTML = `
+          <!-- 頂部精緻白色邊框條 -->
+          <div class="card-top-bar rounded px-1.5 py-1 mb-2">
+            <div class="grid grid-cols-12 items-center text-center font-bold text-[11px] leading-tight">
+              <div class="col-span-3 top-bar-divider pr-0.5 truncate text-slate-800">${card.savedSeries.slice(0, 2)}系</div>
+              <div class="col-span-6 top-bar-divider px-0.5 truncate text-slate-950 font-black">${card.skillName}</div>
+              <div class="col-span-3 pl-0.5 font-mono truncate text-slate-800">${card.code}</div>
+            </div>
+          </div>
+
+          <!-- 下方圖騰矩形 -->
+          <div class="card-illustration-frame rounded h-32 flex items-center justify-center p-2 relative overflow-hidden">
+            <div class="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition duration-300">
+              ${iconSvg}
+            </div>
+            <div class="absolute bottom-1.5 left-2 right-2 flex justify-between text-[10px] text-slate-800 font-semibold bg-white/50 backdrop-blur-sm px-1.5 py-0.5 rounded">
+              <span>${card.studentName || '學員'}</span>
+              <span class="text-sky-950">${card.savedSeries}</span>
+            </div>
+          </div>
+        `;
+
+        cardBox.onclick = () => {
+          showRevealedCard(card);
+        };
+
+        grid.appendChild(cardBox);
+      });
+
+      lucide.createIcons();
+    }
+
+    function renderQuickSeriesStats() {
+      const container = document.getElementById('quickSeriesBadges');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const seriesList = [
+        { name: "破風應變系", icon: "wind" },
+        { name: "逆風探知系", icon: "eye" },
+        { name: "聚風共振系", icon: "radio" },
+        { name: "御風平衡系", icon: "scale" },
+        { name: "疾風具現系", icon: "shield" },
+        { name: "北風異能系", icon: "sparkles" }
+      ];
+
+      seriesList.forEach(s => {
+        const count = playerVault.filter(c => c.savedSeries === s.name).length;
+        const item = document.createElement('div');
+        item.className = "flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-300";
+        item.innerHTML = `
+          <span class="truncate font-medium text-xs">${s.name}</span>
+          <span class="font-bold font-mono text-xs ${count > 0 ? 'text-sky-300 bg-sky-950 border border-sky-800 px-1.5 py-0.5 rounded' : 'text-slate-600'}">${count}</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    /* ============================================================
+       滿額獎勵兌換彈窗
+       ============================================================ */
+    function showRewardModal() {
+      document.getElementById('rewardModal').classList.remove('hidden');
+      triggerConfetti();
+    }
+
+    function closeRewardModal() {
+      document.getElementById('rewardModal').classList.add('hidden');
+    }
+
+    function triggerConfetti() {
+      const duration = 2.5 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+      function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+        const particleCount = 40 * (timeLeft / duration);
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+      }, 250);
+    }
+
+    /* ============================================================
+       0. 後台資料庫管理 (支援檢視、新增、試算表 CSV 匯入覆蓋)
+       ============================================================ */
+    function openDatabaseModal() {
+      document.getElementById('databaseModal').classList.remove('hidden');
+      showImportView(false);
+      renderDatabaseTable();
+    }
+
+    function closeDatabaseModal() {
+      document.getElementById('databaseModal').classList.add('hidden');
+    }
+
+    function showImportView(isImport) {
+      const listView = document.getElementById('dbListView');
+      const importView = document.getElementById('dbImportView');
+      if (isImport) {
+        listView.classList.add('hidden');
+        importView.classList.remove('hidden');
+      } else {
+        listView.classList.remove('hidden');
+        importView.classList.add('hidden');
+      }
+    }
+
+    function renderDatabaseTable() {
+      const tbody = document.getElementById('databaseTableBody');
+      tbody.innerHTML = '';
+      document.getElementById('dbTotalCount').textContent = cardDatabase.length;
+
+      cardDatabase.forEach((card, index) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/50 transition";
+        tr.innerHTML = `
+          <td class="p-2.5 font-bold text-sky-300">${card.code}</td>
+          <td class="p-2.5 text-white font-sans">${card.skillName}</td>
+          <td class="p-2.5 text-slate-300 font-sans">${card.series}</td>
+          <td class="p-2.5 text-slate-400 font-sans">${card.studentName || '-'}</td>
+          <td class="p-2.5 text-right font-sans">
+            <button onclick="testQuickUnlock('${card.code}')" class="px-2 py-1 rounded bg-sky-950 text-sky-300 border border-sky-800 hover:bg-sky-900 text-[11px] font-medium mr-1">
+              解鎖測試
+            </button>
+            <button onclick="deleteCardFromDb(${index})" class="text-rose-400 hover:text-rose-300 text-[11px] px-1">
+              刪除
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function testQuickUnlock(code) {
+      closeDatabaseModal();
+      openUnlockModal();
+      document.getElementById('unlockCodeInput').value = code;
+      attemptUnlock();
+    }
+
+    function deleteCardFromDb(index) {
+      if (confirm(`確定要刪除卡片「${cardDatabase[index].code}」嗎？`)) {
+        cardDatabase.splice(index, 1);
+        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(cardDatabase));
+        renderDatabaseTable();
+        populateSampleCodes();
+      }
+    }
+
+    function resetToDefaultDatabase() {
+      if (confirm("確定要重設資料庫為預設的北風範例卡片嗎？")) {
+        cardDatabase = [...DEFAULT_DATABASE];
+        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(cardDatabase));
+        renderDatabaseTable();
+        populateSampleCodes();
+        alert("已成功重設為預設資料庫！");
+      }
+    }
+
+    function handleCsvImport() {
+      const rawText = document.getElementById('importCsvTextarea').value.trim();
+      if (!rawText) {
+        alert("請貼上 CSV 或試算表內容！");
+        return;
+      }
+
+      const lines = rawText.split('\n');
+      const newCards = [];
+
+      for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+        // 支援逗號或 Tab 分隔
+        const parts = line.includes('\t') ? line.split('\t') : line.split(',');
+        if (parts.length >= 2) {
+          const code = parts[0].trim();
+          const skillName = parts[1].trim();
+          const series = parts[2] ? parts[2].trim() : "破風應變系";
+          const studentName = parts[3] ? parts[3].trim() : "北風學員";
+          
+          if (code && skillName) {
+            newCards.push({ code, skillName, series, studentName });
+          }
+        }
+      }
+
+      if (newCards.length === 0) {
+        alert("未能解析出卡片資料，請確認每行格式為：卡片編號, 技能名稱, 系列, 學生姓名");
+        return;
+      }
+
+      if (confirm(`成功解析出 ${newCards.length} 筆卡片，是否覆蓋現有資料庫？`)) {
+        cardDatabase = newCards;
+        localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(cardDatabase));
+        renderDatabaseTable();
+        populateSampleCodes();
+        showImportView(false);
+        alert(`已成功匯入 ${newCards.length} 張卡片！`);
+      }
+    }
+
+    /* ============================================================
+       清空重設進度
+       ============================================================ */
+    function resetPlayerProgress() {
+      if (confirm("確定要重設當前挑戰者的收集進度嗎？（卡片資料庫不會被刪除）")) {
+        playerVault = [];
+        localStorage.removeItem(STORAGE_KEY_VAULT);
+        renderProgressUI();
+        renderQuickSeriesStats();
+        if (!document.getElementById('skillVaultModal').classList.contains('hidden')) {
+          switchVaultTab(currentVaultTab);
+        }
+        alert("收集進度已歸零！");
+      }
+    }
+
+    // 啟動
+    window.addEventListener('DOMContentLoaded', () => {
+      initApp();
+    });
+  </script>
+</body>
+</html>
