@@ -801,6 +801,29 @@
         </div>
       </div>
 
+      <!-- 家長回饋表引導區塊 -->
+      <div class="bg-gradient-to-r from-sky-950/80 to-blue-950/80 border border-sky-400/50 rounded-2xl p-4 text-left flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+        <div class="space-y-0.5 text-center sm:text-left">
+          <div class="flex items-center justify-center sm:justify-start space-x-1.5 text-xs font-bold text-sky-300">
+            <span>💬</span>
+            <span>活動線上回饋</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            感謝您陪伴孩子探索校園！誠摯邀請家長填寫活動回饋表，給予我們寶貴的建議。
+          </p>
+        </div>
+        <a 
+          href="https://docs.google.com/forms/d/e/1FAIpQLSc7-nyyd08Bi47CDdJS0jmmaEbhCyxb8DaiY1ojaBeTaX-69A/viewform" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="flex-shrink-0 w-full sm:w-auto py-2.5 px-5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-1.5 transition transform hover:scale-105"
+        >
+          <i data-lucide="clipboard-pen" class="w-4 h-4"></i>
+          <span>填寫回饋表</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5 opacity-70"></i>
+        </a>
+      </div>
+
       <div class="flex flex-col sm:flex-row gap-2.5">
         <button onclick="triggerConfetti()" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-sm shadow-lg shadow-amber-500/30 transition">
           再次慶祝 🎉
@@ -1798,6 +1821,7 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
        ============================================================ */
     function showRewardModal() {
       document.getElementById('rewardModal').classList.remove('hidden');
+      lucide.createIcons();
       triggerConfetti();
     }
 
