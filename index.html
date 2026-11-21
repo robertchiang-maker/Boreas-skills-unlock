@@ -500,8 +500,11 @@
   </main>
 
   <!-- ================= 彈窗 1：設定挑戰者姓名 ================= -->
-  <div id="nameModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div id="nameModal" onclick="if(event.target===this) closeNameModal();" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-sky-800/80 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative text-center space-y-5">
+      <button onclick="closeNameModal()" aria-label="關閉視窗" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center absolute top-4 right-4 transition text-lg font-bold border border-slate-700">
+        ✕
+      </button>
       <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/20">
         <i data-lucide="user-check" class="w-8 h-8"></i>
       </div>
@@ -512,23 +515,26 @@
 
       <div class="text-left space-y-1.5">
         <label class="text-xs font-semibold text-slate-300">挑戰者姓名</label>
-        <input id="playerNameInput" type="text" placeholder="範例：北風阿柏" value="北風阿柏" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-4 py-3 text-white text-sm outline-none transition" />
+        <input id="playerNameInput" type="text" placeholder="請輸入你的名字 (例：北風阿柏)" class="w-full bg-slate-950 border border-slate-700 focus:border-sky-400 rounded-xl px-4 py-3 text-white text-sm outline-none transition" />
       </div>
 
       <div class="flex gap-3">
-        <button onclick="savePlayerName()" class="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-sm shadow-lg shadow-sky-500/20 transition">
-          啟程解鎖超能力
+        <button onclick="savePlayerName()" class="flex-1 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-sm shadow-lg shadow-sky-500/20 transition">
+          確認登記
+        </button>
+        <button onclick="closeNameModal()" class="py-3 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition">
+          關閉
         </button>
       </div>
     </div>
   </div>
 
   <!-- ================= 彈窗 2：收集技能「輸入解鎖碼」 ================= -->
-  <div id="unlockModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+  <div id="unlockModal" onclick="if(event.target===this) closeUnlockModal();" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-sky-700/80 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative space-y-6">
       
-      <button onclick="closeUnlockModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition">
-        <i data-lucide="x" class="w-5 h-5"></i>
+      <button onclick="closeUnlockModal()" aria-label="關閉視窗" class="w-10 h-10 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center absolute top-4 right-4 transition text-xl font-bold border border-slate-700 shadow-md">
+        ✕
       </button>
 
       <div class="text-center space-y-2">
@@ -536,13 +542,13 @@
           <i data-lucide="compass" class="w-6 h-6 animate-spin" style="animation-duration: 12s;"></i>
         </div>
         <h3 class="text-xl sm:text-2xl font-black text-white">聽完故事請輸入解鎖碼</h3>
-        <p class="text-xs text-slate-400">請輸入故事中獲得的「卡片編號」，即可解鎖隱藏卡片。</p>
+        <p class="text-xs text-slate-400">請輸入故事中獲得的專屬解鎖碼，即可解鎖隱藏卡片。</p>
       </div>
 
       <!-- 輸入區塊 -->
       <div class="space-y-3">
         <div class="relative">
-          <input id="unlockCodeInput" type="text" placeholder="請輸入卡片解鎖碼 (例如：B798、B837...)" class="w-full bg-slate-950 border-2 border-slate-700 focus:border-sky-400 rounded-2xl px-5 py-4 text-white text-base font-mono uppercase tracking-wider outline-none transition placeholder:text-slate-600" onkeydown="if(event.key === 'Enter') attemptUnlock();" />
+          <input id="unlockCodeInput" type="text" placeholder="請輸入卡片解鎖碼" class="w-full bg-slate-950 border-2 border-slate-700 focus:border-sky-400 rounded-2xl px-5 py-4 text-white text-base font-mono uppercase tracking-wider outline-none transition placeholder:text-slate-600" onkeydown="if(event.key === 'Enter') attemptUnlock();" />
           <button onclick="attemptUnlock()" class="absolute right-2 top-2 bottom-2 px-5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-sm flex items-center space-x-1 shadow-md transition">
             <span>解鎖</span>
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -551,22 +557,40 @@
         
         <div id="unlockErrorMsg" class="text-xs text-rose-400 hidden flex items-center space-x-1">
           <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
-          <span id="unlockErrorText">找不到對應的卡片編號，請再檢查一次！</span>
+          <span id="unlockErrorText">解鎖碼不正確，請再確認一次！</span>
         </div>
       </div>
 
-      <!-- 提示說明 -->
+      <!-- 提示說明 (不包含任何範例號碼) -->
       <div class="bg-slate-950/40 rounded-2xl p-4 border border-slate-800 text-xs text-slate-400 flex items-start space-x-2.5">
         <i data-lucide="sparkles" class="w-4 h-4 text-sky-400 flex-shrink-0 mt-0.5"></i>
-        <span>聽完校園故事後獲得的卡片解鎖碼（例如：B798、B837...），輸入正確即可喚醒專屬超能力！</span>
+        <span>聽完校園故事後獲得的專屬解鎖碼，輸入正確即可喚醒隱藏超能力！</span>
+      </div>
+
+      <!-- 底部明確關閉按鈕 -->
+      <div class="pt-1 flex justify-center">
+        <button onclick="closeUnlockModal()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition flex items-center justify-center space-x-1.5 border border-slate-700">
+          <span>✕ 關閉此視窗</span>
+        </button>
       </div>
 
     </div>
   </div>
 
   <!-- ================= 彈窗 3：卡片跳出展示 & 存入技能庫 (完全依據附圖樣式) ================= -->
-  <div id="cardRevealModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
-    <div class="max-w-xl w-full my-auto space-y-6 flex flex-col items-center">
+  <div id="cardRevealModal" onclick="if(event.target===this) closeCardRevealModal();" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="max-w-xl w-full my-auto space-y-4 flex flex-col items-center relative py-4">
+      
+      <!-- 頂部醒目關閉按鈕 -->
+      <div class="w-full max-w-[480px] flex items-center justify-between pb-1">
+        <span class="text-xs font-bold text-sky-400 flex items-center space-x-1.5">
+          <span>✦</span>
+          <span id="revealModalTitleText">隱藏超能力卡片</span>
+        </span>
+        <button onclick="closeCardRevealModal()" aria-label="關閉卡片" class="py-1.5 px-3 rounded-full bg-slate-800/90 hover:bg-rose-900 border border-slate-600 hover:border-rose-400 text-slate-200 hover:text-white text-xs font-bold transition flex items-center space-x-1 shadow-lg">
+          <span>✕ 關閉視窗</span>
+        </button>
+      </div>
       
       <!-- 解鎖卡片本體 (完全復刻附圖) -->
       <div id="revealedCardElement" class="w-full max-w-[480px] rounded-2xl p-5 md:p-6 card-texture-bg text-slate-900 select-none relative transition-all duration-500 transform hover:scale-[1.01]">
@@ -625,13 +649,14 @@
 
       </div>
 
-      <!-- 下方操作操作區：4. 卡片跳出後，出現「存入技能庫」並讓玩家選擇系列 -->
+      <!-- 下方操作區：智慧切換未存入 / 已存入狀態 -->
       <div class="bg-slate-900 border border-sky-800/80 rounded-2xl p-5 w-full max-w-[480px] shadow-xl space-y-4">
-        <div>
+        
+        <!-- 狀態 A：尚未存入技能庫 (解鎖時) -->
+        <div id="cardSaveSelectionArea">
           <label class="block text-xs font-bold text-sky-300 mb-1.5">
             選擇存入的系列庫類別：
           </label>
-          <!-- 六大系列直接平鋪列出 (非下拉式選單) -->
           <div class="flex items-center justify-between mb-2">
             <span class="text-[11px] text-slate-400">請直接點選想要歸類的系列：</span>
             <span id="selectedSeriesDisplayBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-600">
@@ -683,16 +708,28 @@
               <span class="check-icon hidden text-sky-400 font-black">✓</span>
             </button>
           </div>
-          <p class="text-[11px] text-slate-400 mt-1">系統已依據卡片特性預先建議，你亦可依自身理解指定分類。</p>
+          <p class="text-[11px] text-slate-400 mt-1.5">系統已依據卡片特性預先建議，你亦可依自身理解指定分類。</p>
         </div>
 
-        <div class="flex gap-3">
-          <button onclick="commitCardToVault()" class="flex-1 py-3 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 transition">
+        <!-- 狀態 B：已在技能庫中 (從技能庫點開放大檢視) -->
+        <div id="cardAlreadySavedArea" class="hidden p-3.5 rounded-xl bg-sky-950/60 border border-sky-500/40 text-center space-y-1">
+          <div class="text-xs font-bold text-sky-300 flex items-center justify-center space-x-1.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+            <span>此技能卡已在你的技能庫中</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            目前存放於：<strong id="cardSavedSeriesDisplay" class="text-amber-300 underline font-bold"></strong>
+          </p>
+        </div>
+
+        <!-- 按鈕操作群 -->
+        <div class="flex gap-3 pt-1">
+          <button id="commitCardBtn" onclick="commitCardToVault()" class="flex-1 py-3 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 transition">
             <i data-lucide="download" class="w-4 h-4"></i>
             <span>存入技能庫</span>
           </button>
-          <button onclick="closeCardRevealModal()" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
-            暫不存入
+          <button onclick="closeCardRevealModal()" class="py-3 px-6 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold transition flex items-center justify-center space-x-1 border border-slate-700">
+            <span>✕ 關閉視窗</span>
           </button>
         </div>
       </div>
@@ -701,7 +738,7 @@
   </div>
 
   <!-- ================= 彈窗 4：5.「技能庫」六大系列檢視 ================= -->
-  <div id="skillVaultModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden">
+  <div id="skillVaultModal" onclick="if(event.target===this) closeSkillVaultModal();" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden">
     <div class="bg-slate-900 border border-sky-800/80 rounded-3xl w-full max-w-5xl h-[88vh] flex flex-col shadow-2xl overflow-hidden">
       
       <!-- 技能庫頂部 -->
@@ -715,8 +752,8 @@
             挑戰者：<span class="text-amber-300 font-bold" id="vaultPlayerName">北風阿柏</span> ｜ 已解鎖 <strong id="vaultCountText" class="text-sky-300">0</strong> / 12 張技能卡
           </p>
         </div>
-        <button onclick="closeSkillVaultModal()" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button onclick="closeSkillVaultModal()" aria-label="關閉技能庫" class="px-3.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center space-x-1 text-slate-300 hover:text-white transition text-xs font-bold border border-slate-700">
+          <span>✕ 關閉</span>
         </button>
       </div>
 
@@ -753,17 +790,22 @@
       <!-- 技能庫底部動作 -->
       <div class="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs text-slate-400">
         <span>點擊卡片可放大檢視詳情</span>
-        <button onclick="openUnlockModal(); closeSkillVaultModal();" class="text-sky-400 hover:text-sky-300 font-bold flex items-center space-x-1">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i>
-          <span>前往輸入新解鎖碼</span>
-        </button>
+        <div class="flex items-center space-x-3">
+          <button onclick="openUnlockModal(); closeSkillVaultModal();" class="text-sky-400 hover:text-sky-300 font-bold flex items-center space-x-1">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>輸入新解鎖碼</span>
+          </button>
+          <button onclick="closeSkillVaultModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold transition border border-slate-700">
+            ✕ 關閉技能庫
+          </button>
+        </div>
       </div>
 
     </div>
   </div>
 
   <!-- ================= 彈窗 5：滿額 12 張「任務完成，兌換獎品」 ================= -->
-  <div id="rewardModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+  <div id="rewardModal" onclick="if(event.target===this) closeRewardModal();" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
     <div class="bg-gradient-to-b from-slate-900 to-sky-950 border-2 border-amber-400 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative text-center space-y-6">
       
       <button onclick="closeRewardModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition">
@@ -1207,7 +1249,7 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
   {
     "code": "B059",
     "studentName": "秉鈞.念宇.先亞.語恬.初淨.亮希.勻瑨",
-    "skillName": "「虫合？」",
+    "skillName": "大瞎掰術",
     "series": "未知"
   },
   {
@@ -1269,7 +1311,7 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
     /* ============================================================
        應用程式狀態管理 (LocalStorage 永久存取)
        ============================================================ */
-    const STORAGE_KEY_DB = 'BOREAS_CARDS_DATABASE_V2';
+    const STORAGE_KEY_DB = 'BOREAS_CARDS_DATABASE_V3';
     const STORAGE_KEY_PLAYER = 'BOREAS_PLAYER_NAME_V1';
     const STORAGE_KEY_VAULT = 'BOREAS_PLAYER_VAULT_V1';
 
@@ -1325,6 +1367,10 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
       if (savedVault) {
         try {
           playerVault = JSON.parse(savedVault);
+          // 同步修正 B059 歷史紀錄名稱
+          playerVault.forEach(card => {
+            if (card.code === 'B059') card.skillName = '大瞎掰術';
+          });
         } catch(e) {
           playerVault = [];
         }
@@ -1536,17 +1582,7 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
 
     function populateSampleCodes() {
       const container = document.getElementById('sampleCodesContainer');
-      container.innerHTML = '';
-      cardDatabase.slice(0, 10).forEach(card => {
-        const btn = document.createElement('button');
-        btn.className = "px-2 py-1 rounded bg-slate-800 hover:bg-sky-950 hover:text-sky-300 border border-slate-700 text-[11px] font-mono transition";
-        btn.textContent = card.code;
-        btn.onclick = () => {
-          document.getElementById('unlockCodeInput').value = card.code;
-          attemptUnlock();
-        };
-        container.appendChild(btn);
-      });
+      if (container) container.innerHTML = '';
     }
 
     function fillRandomCode() {
@@ -1623,14 +1659,55 @@ BF-201, 逆流追風之眼, 逆風探知系, 楊靖鈞" class="w-full bg-slate-9
       const iconSvg = SERIES_ICONS[card.series] || SERIES_ICONS['未知'];
       document.getElementById('revealedCardIconContainer').innerHTML = iconSvg;
 
-      // 設定預設選擇的存入系列 (六個系列直接平鋪列出)
-      const targetOptions = ["破風應變系", "逆風探知系", "聚風共振系", "御風平衡系", "疾風具現系", "北風異能系"];
-      const defaultSeries = targetOptions.includes(card.series) ? card.series : "破風應變系";
-      selectSeriesTarget(defaultSeries);
+      // 判斷是否已經在技能庫中 (例如從技能庫點開放大檢視)
+      const existingInVault = playerVault.find(c => c.code.toLowerCase() === card.code.toLowerCase());
+      const saveArea = document.getElementById('cardSaveSelectionArea');
+      const alreadyArea = document.getElementById('cardAlreadySavedArea');
+      const commitBtn = document.getElementById('commitCardBtn');
+      const titleText = document.getElementById('revealModalTitleText');
+
+      if (existingInVault) {
+        if (saveArea) saveArea.classList.add('hidden');
+        if (alreadyArea) alreadyArea.classList.remove('hidden');
+        if (commitBtn) commitBtn.classList.add('hidden');
+        if (titleText) titleText.textContent = "已解鎖技能卡檢視";
+        const savedSeriesName = existingInVault.savedSeries || card.series;
+        document.getElementById('cardSavedSeriesDisplay').textContent = savedSeriesName;
+      } else {
+        if (saveArea) saveArea.classList.remove('hidden');
+        if (alreadyArea) alreadyArea.classList.add('hidden');
+        if (commitBtn) commitBtn.classList.remove('hidden');
+        if (titleText) titleText.textContent = "恭喜解鎖全新技能卡！";
+        const targetOptions = ["破風應變系", "逆風探知系", "聚風共振系", "御風平衡系", "疾風具現系", "北風異能系"];
+        const defaultSeries = targetOptions.includes(card.series) ? card.series : "破風應變系";
+        selectSeriesTarget(defaultSeries);
+      }
 
       // 顯示彈窗
       document.getElementById('cardRevealModal').classList.remove('hidden');
+      lucide.createIcons();
     }
+
+        function closeNameModal() {
+      const modal = document.getElementById('nameModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function closeAllModals() {
+      closeUnlockModal();
+      closeCardRevealModal();
+      closeSkillVaultModal();
+      closeRewardModal();
+      closeNameModal();
+      if (typeof closeDatabaseModal === 'function') closeDatabaseModal();
+    }
+
+    // 全域鍵盤 ESC 鍵關閉所有彈出視窗
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        closeAllModals();
+      }
+    });
 
     function closeCardRevealModal() {
       document.getElementById('cardRevealModal').classList.add('hidden');
